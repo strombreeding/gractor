@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Gps, GpsDocument } from './schemas/gps.schema';
@@ -18,6 +18,11 @@ export class GpsRepository {
     console.log(findFilter);
 
     const gps = await this.gpsModel.findOne(findFilter);
+    if (!gps)
+      throw new HttpException(
+        '해당 주소로된 데이터가 존재하지 않음',
+        HttpStatus.NOT_FOUND,
+      );
     const result = {
       do: Do,
       si,
@@ -26,7 +31,12 @@ export class GpsRepository {
       ny: gps.defaultXY[1],
     };
     if (vilageName) {
-      console.log('ㅎㅇ');
+      const isVilage = gps.etc.find((etc) => etc.vilage === vilageName);
+      if (!isVilage)
+        throw new HttpException(
+          '해당 읍면리로 데이터를 찾을 수 없습니다',
+          HttpStatus.NOT_FOUND,
+        );
       gps.etc.map((vilage) => {
         if (vilage.vilage === vilageName) {
           result.nx = vilage.nx;
@@ -34,8 +44,9 @@ export class GpsRepository {
         }
       });
     }
+    // console.log(result);
     return result;
-    return 'gps';
+    // return gps;
   }
 
   async isertData(data: any) {

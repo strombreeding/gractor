@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SeoulModule } from './seoul/seoul.module';
 import { GpsModule } from './gps/gps.module';
+import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { GpsModule } from './gps/gps.module';
       process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017',
     ),
     SeoulModule,
-    GpsModule,
+    LocationModule,
+    // GpsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

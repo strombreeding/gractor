@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Gps, GpsDocument } from './schemas/gps.schema';
@@ -21,7 +21,9 @@ export class GpsService {
     return;
   }
 
-  async getGps(Do: string, si: string, vilage: string) {
+  async getGps(Do: string, si?: string, vilage?: string) {
+    if (!Do && !si && vilage)
+      throw new HttpException('정확한 주소 입력바람', HttpStatus.BAD_REQUEST);
     const gps = await this.gpsRepo.getGps(Do, si, vilage);
     return gps;
   }

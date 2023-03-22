@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { GpsService } from 'src/gps/gps.service';
 
 const reqAndDB = async (): Promise<void> => {
   // 대기 예보 시간대
@@ -15,6 +16,7 @@ const reqAndDB = async (): Promise<void> => {
   } else {
     nowHours = `${mockHours}`;
   }
+  const workingLocationArr = [];
   // console.log(`현재 날짜 : ${nowYear}년 ${nowHours}시 ${nowMinutes}분`);
   // console.log(`SSL 요청 가능여부 : `, nowMinutes > 41);
   // console.log(`SSF 요청 가능여부 : `, nowMinutes > 46);
@@ -73,7 +75,10 @@ export class PublicApiService {
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
   private serviceKey = process.env.SERVICE_KEY;
-  constructor() {}
+  constructor(private gpsService: GpsService) {}
+  async test() {
+    const a = await this.gpsService.getGps('서울특별시', '관악구');
+  }
   async zz(control: string) {
     // if (control === 'start' && this.isWorking === 0) {
     //   console.log(control);
