@@ -4,6 +4,6 @@ import { PublicApiController } from './public-api.controller';
 
 @Module({
   providers: [PublicApiService],
-  controllers: [PublicApiController]
+  controllers: [PublicApiController],
 })
 export class PublicApiModule {}

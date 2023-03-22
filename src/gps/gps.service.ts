@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Gps, GpsDocument } from './schemas/gps.schema';
 import { google } from 'googleapis';
-import { client_email, private_key } from '../eum-366115-61fa453cf283.json';
 import { GpsRepository } from './gps.repository';
+import * as utils from '../utils/utils';
 
 @Injectable()
 export class GpsService {
-  private googleSheet = connectGoogleApi();
+  private googleSheet = utils.connectGoogleApi();
   constructor(private gpsRepo: GpsRepository) {}
 
   async getData() {
@@ -20,15 +20,9 @@ export class GpsService {
     await this.gpsRepo.isertData(datas.data.values);
     return;
   }
+
+  async getGps(Do: string, si: string, vilage: string) {
+    const gps = await this.gpsRepo.getGps(Do, si, vilage);
+    return gps;
+  }
 }
-export const connectGoogleApi = () => {
-  const authorize = new google.auth.JWT(client_email, null, private_key, [
-    'https://www.googleapis.com/auth/spreadsheets',
-  ]);
-  // google spread sheet api 가져오기
-  const googleSheet = google.sheets({
-    version: 'v4',
-    auth: authorize,
-  });
-  return googleSheet;
-};

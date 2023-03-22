@@ -9,5 +9,6 @@ import { GpsController } from './gps.controller';
   imports: [MongooseModule.forFeature([{ name: Gps.name, schema: GpsSchema }])],
   providers: [GpsService, GpsRepository],
   controllers: [GpsController],
+  exports: [GpsService, GpsRepository],
 })
 export class GpsModule {}

@@ -10,6 +10,34 @@ export class GpsRepository {
     private gpsModel: Model<GpsDocument>,
   ) {}
 
+  async getGps(Do: string, si?: string, vilageName?: string) {
+    const findFilter = {
+      ...(Do && { do: Do }),
+      ...(si && { si }),
+    };
+    console.log(findFilter);
+
+    const gps = await this.gpsModel.findOne(findFilter);
+    const result = {
+      do: Do,
+      si,
+      vilage: vilageName,
+      nx: gps.defaultXY[0],
+      ny: gps.defaultXY[1],
+    };
+    if (vilageName) {
+      console.log('ㅎㅇ');
+      gps.etc.map((vilage) => {
+        if (vilage.vilage === vilageName) {
+          result.nx = vilage.nx;
+          result.ny = vilage.ny;
+        }
+      });
+    }
+    return result;
+    return 'gps';
+  }
+
   async isertData(data: any) {
     for (let i = 0; i < data.length; i++) {
       const etc = {

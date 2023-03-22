@@ -1,3 +1,6 @@
+import { google } from 'googleapis';
+import { client_email, private_key } from '../eum-366115-61fa453cf283.json';
+
 /**api데이터 요청후 category와 obsrValue를 넣으면 단위를 추가해줌 */
 export const stfGender = (category: string, obsrValue: string) => {
   switch (category) {
@@ -42,4 +45,17 @@ export const stfGender = (category: string, obsrValue: string) => {
     case 'WSD':
       break;
   }
+};
+
+/**구글 시트 연결 */
+export const connectGoogleApi = () => {
+  const authorize = new google.auth.JWT(client_email, null, private_key, [
+    'https://www.googleapis.com/auth/spreadsheets',
+  ]);
+  // google spread sheet api 가져오기
+  const googleSheet = google.sheets({
+    version: 'v4',
+    auth: authorize,
+  });
+  return googleSheet;
 };
