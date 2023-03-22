@@ -7,7 +7,10 @@ export type STFDocument = STF & Document;
 // 아래와 같이 timestamp 설정도 가능하다.
 // createdAt과 updatedAt둘 중에 하나만 사용하고 싶다면 아래와 같이 작성도 가능하다.
 // @Schema({ timestamps: { createdAt: "createdAt", updatedAt: false } })
-@Schema({ timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
+@Schema({
+  collection: 'seoul',
+  timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
+})
 export class STF {
   @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
   createdAt: Date;
@@ -16,18 +19,36 @@ export class STF {
   updatedAt: Date;
 
   @Prop()
-  date: string;
+  date: string; //20230301
 
   @Prop()
-  time: string;
+  time: string; // 몇시 02시,  11시
 
   @Prop()
-  etc: {
-    강수량: string;
-    풍속: string;
-    기타등등: string;
-  };
+  temperature: string; // 기온 ℃
+  @Prop()
+  precipitation: string; // 1시간 강수량 mm
+  @Prop()
+  precipitationPattern: string; // 강수 형태 없음(0), 비(1), 비/눈(2), 눈(3), 빗방울(5), 빗방울눈날림(6), 눈날림(7)
+  @Prop()
+  EW_windInfo: string; // 동서바람성분 m/s
+  @Prop()
+  SN_windInfo: string; // 남북바람성분 m/s
+  @Prop()
+  windDirection: string; // 풍향 ° deg
+  @Prop()
+  windSpeed: string; // 풍속 m/s
+  @Prop()
+  humidity: string; //습도 %
 }
+// T1H	기온	℃	10
+// RN1	1시간 강수량	mm	8
+// UUU	동서바람성분	m/s	12
+// VVV	남북바람성분	m/s	12
+// REH	습도	%	8
+// PTY	강수형태	코드값	4
+// VEC	풍향	deg	10
+// WSD	풍속	m/s	10
 
 // 위의 작성한 클래스를 바탕으로 Mongoose에서 사용하는 스키마 클래스를 만들어준다.
 export const STFSchema = SchemaFactory.createForClass(STF);
