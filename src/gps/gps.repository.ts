@@ -10,6 +10,7 @@ export class GpsRepository {
     private gpsModel: Model<GpsDocument>,
   ) {}
 
+  /** 해당 좌표를 가진 모든 지명 반환 repo로직 */
   async gpsToLocations(gps: any) {
     const stringXY = [gps.nx, gps.ny];
     const arr = await this.gpsModel.find({
@@ -42,6 +43,7 @@ export class GpsRepository {
     return result;
   }
 
+  /** 입력 지명을 기반으로 좌표뽑아내기 */
   async getGps(Do: string, si?: string, vilageName?: string) {
     const findFilter = {
       ...(Do && { do: Do }),
@@ -81,6 +83,9 @@ export class GpsRepository {
     // return gps;
   }
 
+  /** 업데이트 내역이 있을때 MongoDB에 저장함.
+   * 구글스프레드시트 기반으로 됨
+   */
   async isertData(data: any) {
     for (let i = 0; i < data.length; i++) {
       const etc = {

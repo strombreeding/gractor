@@ -13,10 +13,19 @@ export class LocationService {
     private gpsService: GpsService,
   ) {}
 
+  async getAllLocations() {
+    const locations = (await this.locationModel.find({}))[0];
+    const result = {
+      do: locations.do,
+      si: locations.si,
+      vilage: locations.vilage,
+      xyWorking: locations.xyWorking,
+    };
+    return result;
+  }
   async getWorkingLocation(gps) {
-    const zz = await this.gpsService.getLocations(gps);
-    // const locations = (await this.locationModel.find({}))[0];
-    return zz;
+    const locations = await this.gpsService.getLocations(gps);
+    return locations;
   }
 
   async insertLocation(xyArr: string[], gps: any) {
@@ -42,22 +51,10 @@ export class LocationService {
       aleardyLocation.xyWorking.push(stringXY);
 
       // 좌표가 같은 다른 지명 추가
-      for (let i = 0; i < locationsArr.Do.length; i++) {
-        if (aleardyLocation.do.includes(locationsArr.Do[i])) {
-          aleardyLocation.do.push(locationsArr.Do[i]);
-        }
-      }
-      for (let i = 0; i < locationsArr.si.length; i++) {
-        if (aleardyLocation.si.includes(locationsArr.si[i])) {
-          aleardyLocation.si.push(locationsArr.si[i]);
-        }
-      }
-      for (let i = 0; i < locationsArr.vilages.length; i++) {
-        if (aleardyLocation.vilage.includes(locationsArr.vilages[i])) {
-          aleardyLocation.vilage.push(locationsArr.vilages[i]);
-        }
-      }
-
+      const location = addLocation(aleardyLocation, locationsArr);
+      aleardyLocation.do = location.do;
+      aleardyLocation.si = location.si;
+      aleardyLocation.vilage = location.vilage;
       // 업데이트
       const updateLocation = aleardyLocation;
       await this.locationModel.updateOne(
@@ -73,21 +70,78 @@ export class LocationService {
   async deleteLocation(xyArr: string[], gps: any) {
     const [x, y] = xyArr;
     const stringXY = `${x},${y}`;
-    const location = (await this.locationModel.find({}))[0];
-    console.log(location.xyWorking.includes(stringXY));
-    if (!location || !location.xyWorking.includes(stringXY))
+    const aleardyLocation = (await this.locationModel.find({}))[0];
+    const workingArr = await this.gpsService.getLocations(gps);
+    console.log(aleardyLocation.xyWorking.includes(stringXY));
+    if (!aleardyLocation || !aleardyLocation.xyWorking.includes(stringXY))
       throw new HttpException('데이터가 비어있습니다', HttpStatusCode.NotFound);
     // const a = await this.gpsService.getGps(gps.do, gps.si, gps.vilage);
-    for (let i = 0; i < location.xyWorking.length; i++) {
-      if (location.xyWorking[i] === stringXY) {
-        location.xyWorking.splice(i, 1);
-        await this.locationModel.updateOne(
-          { _id: location._id },
-          { $set: location },
-        );
+
+    const targetLocation = deleteLocation(aleardyLocation, workingArr);
+    aleardyLocation.do = targetLocation.do;
+    aleardyLocation.si = targetLocation.si;
+    aleardyLocation.vilage = targetLocation.vilage;
+    for (let i = 0; i < aleardyLocation.xyWorking.length; i++) {
+      if (aleardyLocation.xyWorking[i] === stringXY) {
+        aleardyLocation.xyWorking.splice(i, 1);
         break;
       }
     }
-    return location;
+    await this.locationModel.updateOne(
+      { _id: aleardyLocation._id },
+      { $set: aleardyLocation },
+    );
+    return aleardyLocation;
   }
 }
+
+export const deleteLocation = (
+  location: Location,
+  locationInfo: {
+    Do: string[];
+    si: string[];
+    vilages: string[];
+  },
+) => {
+  locationInfo.Do.map((Do) => {
+    if (location.do.includes(Do)) {
+      const index = location.do.indexOf(Do);
+      location.do.splice(index, 1);
+    }
+  });
+  locationInfo.si.map((si) => {
+    if (location.si.includes(si)) {
+      const index = location.si.indexOf(si);
+      location.si.splice(index, 1);
+    }
+  });
+  locationInfo.vilages.map((vilage) => {
+    if (location.vilage.includes(vilage)) {
+      const index = location.vilage.indexOf(vilage);
+      location.vilage.splice(index, 1);
+    }
+  });
+  return location;
+};
+
+export const addLocation = (
+  location: Location,
+  locationInfo: { Do: string[]; si: string[]; vilages: string[] },
+) => {
+  locationInfo.Do.map((Do) => {
+    if (!location.do.includes(Do)) {
+      location.do.push(Do);
+    }
+  });
+  locationInfo.si.map((si) => {
+    if (!location.si.includes(si)) {
+      location.si.push(si);
+    }
+  });
+  locationInfo.vilages.map((vilage) => {
+    if (!location.vilage.includes(vilage)) {
+      location.vilage.push(vilage);
+    }
+  });
+  return location;
+};

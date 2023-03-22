@@ -22,6 +22,21 @@ export class LocationController {
   ) {}
 
   @ApiOperation({
+    summary: '수집중인 모든 지역 확인',
+    description: '수집중인 모든지역의 지명 과 좌표 반환',
+  })
+  @ApiCreatedResponse({
+    status: 200,
+    type: Location,
+  })
+  @Get('/all')
+  async getAllLocations() {
+    const result = await this.locationService.getAllLocations();
+    return result;
+  }
+  //
+
+  @ApiOperation({
     summary: '수집지역 확인',
     description:
       '수집지역에 대한 정보를 확인하세요. \n예) 서울시 관악구 추가 => 서울특별시/관악구 body에 null 정확히 입력',
@@ -35,10 +50,15 @@ export class LocationController {
   async getLocations(@Query() query: LocationDto) {
     const { Do, si, vilage } = query;
     const gps = await this.gpsService.getGps(Do, si, vilage);
-    const a = await this.locationService.getWorkingLocation(gps);
-    console.log(gps);
-    return a;
+    const arr = await this.locationService.getWorkingLocation(gps);
+    const result = {
+      gps: gps,
+      locations: arr,
+    };
+    return result;
   }
+  //
+
   @ApiOperation({
     summary: '수집지역 추가',
     description:
@@ -59,6 +79,8 @@ export class LocationController {
     return result;
     // return 'zz';
   }
+  //
+
   @ApiOperation({
     summary: '수집지역 제거',
     description:
@@ -76,4 +98,5 @@ export class LocationController {
     const result = await this.locationService.deleteLocation(stringXY, gps);
     return result;
   }
+  //
 }

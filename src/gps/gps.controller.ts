@@ -8,15 +8,15 @@ export class GpsController {
   constructor(private gpsService: GpsService) {}
 
   @Get('/insert')
-  async getData() {
-    const result = await this.gpsService.getData();
+  async insertData() {
+    const result = await this.gpsService.insertData();
     return result;
   }
 
   @Get('/')
-  async zz(@Query() query: GpsDto) {
+  async gps(@Query() query: GpsDto) {
     const { Do, si, vilage } = query;
-    const aa = await this.gpsService.getGps(Do, si, vilage);
-    return aa;
+    const gps = await this.gpsService.getGps(Do, si, vilage);
+    return gps;
   }
 }
