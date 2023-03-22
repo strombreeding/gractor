@@ -22,15 +22,14 @@ export class StfRepository {
     @InjectModel(Stf.name)
     private stfModel: Model<StfDocument>,
   ) {}
-  // 0600 1500 = 14
-  async create(data: StfType[]) {
-    // let count = 0;
+  async create(data: StfType[], gps: any) {
     for (let i = 0; i < data.length; ) {
       if (i >= data.length) break;
       let newStf = {
         openDate: '',
         openTime: '',
-        gps: '',
+        nx: gps[0],
+        ny: gps[1],
         temperatureForHour: '',
         humidity: '',
         heightTemp: '',
@@ -49,8 +48,6 @@ export class StfRepository {
       const fcstTime = data[i].fcstTime;
 
       while (true) {
-        // 올려줬을때 undifined 라면 멈춰줘야함
-        // if (data[i] === undefined) break;
         if (data[i + 1] === undefined) {
           ++i;
           break;
@@ -62,37 +59,59 @@ export class StfRepository {
             data[i].category,
             data[i].fcstValue,
           );
-          newStf = utils.stfCreater(newStf, data[i].category, value);
+          newStf = utils.keyCreater(newStf, data[i].category, value);
           ++i;
           break;
         }
-        // if (data[i + 1].fcstTime !== fcstTime && i < data.length) {
-        //   // 멈춰도 i는 올려줘야함. 안그러면 무한루프임
-        //   ++i;
-        //   break;
-        // }
-        // }
-        //
+
         newStf.openDate = data[i].fcstDate;
         newStf.openTime = data[i].fcstTime;
         const value = utils.addSignGender(data[i].category, data[i].fcstValue);
-        newStf = utils.stfCreater(newStf, data[i].category, value);
-        // if (data[i].category === 'TMX' || data[i].category === 'TMN') {
-        //   console.log('오 카테고리 있다!!', newStf);
-        // }
+        newStf = utils.keyCreater(newStf, data[i].category, value);
         ++i;
       }
+      // 업뎃이라면 업뎃, 아니면 만들기
       const stf = await this.stfModel.findOne({
         openDate: newStf.openDate,
         openTime: newStf.openTime,
+        nx: newStf.nx,
+        ny: newStf.ny,
       });
       if (stf) {
         await this.stfModel.updateOne({ _id: stf._id }, { $set: newStf });
       } else {
         await this.stfModel.create(newStf);
       }
-      // ++count;
+
+      // 예보날짜에 최고, 최저기온 있을시 업데이트
+      if (newStf.heightTemp !== '') {
+        console.log('최고기온 발견 !');
+        await this.stfModel.updateMany(
+          {
+            openDate: newStf.openDate,
+            heightTemp: '',
+          },
+          {
+            $set: {
+              heightTemp: newStf.heightTemp,
+            },
+          },
+        );
+      }
+      if (newStf.lowTemp !== '') {
+        console.log('최저기온 발견 !');
+        await this.stfModel.updateMany(
+          {
+            openDate: newStf.openDate,
+            lowTemp: '',
+          },
+          {
+            $set: {
+              lowTemp: newStf.lowTemp,
+            },
+          },
+        );
+      }
     }
-    // console.log('작업끝!', count);
   }
 }

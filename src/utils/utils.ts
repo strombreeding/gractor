@@ -68,9 +68,6 @@ export const addSignGender = (category: string, obsrValue: string) => {
     case 'RN1':
       category = `${obsrValue} mm`;
       break;
-    case 'RN1':
-      category = `${obsrValue} mm`;
-      break;
     case 'LGT':
       category = `${obsrValue} kA (킬로암페어)`;
       break;
@@ -78,7 +75,7 @@ export const addSignGender = (category: string, obsrValue: string) => {
   return category;
 };
 
-export const stfCreater = (data, category, value) => {
+export const keyCreater = (data, category, value) => {
   switch (category) {
     case 'POP':
       data.precipitationPercent = value;
@@ -122,6 +119,15 @@ export const stfCreater = (data, category, value) => {
     case 'WSD':
       data.windSpeed = value;
       break;
+    case 'T1H':
+      data.temperature = value;
+      break;
+    case 'RN1':
+      data.precipitation = value;
+      break;
+    case 'LGT':
+      data.thunderstroke = value;
+      break;
   }
   return data;
 };
@@ -137,11 +143,12 @@ export const connectGoogleApi = () => {
   });
   return googleSheet;
 };
-
+//
 export const getDate = () => {
   const nowYear = `${new Date().getFullYear()}`;
-  const mockHours = 2;
-  // const mockHours = new Date().getHours();
+  // 테스트 하고 싶다면 아래 시간대 변경후 public-api service 에서 min을 45 이상으로 변경
+  // const mockHours = 0;
+  const mockHours = new Date().getHours();
   const mockMonth = new Date().getMonth() + 1;
   let nowMonth = '';
   let nowHours = '';

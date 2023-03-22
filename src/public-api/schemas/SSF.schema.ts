@@ -8,18 +8,23 @@ export type SsfDocument = Ssf & Document;
 // createdAt과 updatedAt둘 중에 하나만 사용하고 싶다면 아래와 같이 작성도 가능하다.
 // @Schema({ timestamps: { createdAt: "createdAt", updatedAt: false } })
 @Schema({
-  collection: 'seoul',
   timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
 })
 export class Ssf {
-  @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
+  @Prop({
+    default: new Date(),
+    type: mongoose.Schema.Types.Date,
+    expires: 86400 / 2,
+  })
   createdAt: Date;
 
   @Prop({ default: new Date(), type: mongoose.Schema.Types.Date })
   updatedAt: Date;
 
   @Prop()
-  gps: string[];
+  nx: string;
+  @Prop()
+  ny: string;
 
   @Prop()
   openDate: string; //20230301

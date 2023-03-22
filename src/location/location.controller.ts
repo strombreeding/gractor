@@ -14,7 +14,7 @@ import { LocationService } from './location.service';
 import { Location } from './schemas/location.schema';
 
 @Controller('location')
-@ApiTags('데이터 수집지역 관련 CRUD')
+@ApiTags('데이터 수집지역 추가/삭제/조회')
 export class LocationController {
   constructor(
     private locationService: LocationService,
@@ -72,9 +72,14 @@ export class LocationController {
   @Post()
   async insertLocation(@Body() body: LocationDto) {
     const { Do, si, vilage } = body;
-    const gps = await this.gpsService.getGps(Do, si, vilage);
+
+    const gps = await this.gpsService.getGps(
+      Do.trim(),
+      si.trim(),
+      vilage.trim(),
+    );
     const stringXY = [gps.nx, gps.ny];
-    console.log(stringXY);
+    console.log(stringXY, '좌표');
     const result = await this.locationService.insertLocation(stringXY, gps);
     return result;
     // return 'zz';

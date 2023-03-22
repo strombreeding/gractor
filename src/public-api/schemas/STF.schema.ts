@@ -26,7 +26,9 @@ export class Stf {
   openTime: string; // 몇시 02시,  11시
 
   @Prop()
-  gps: string[];
+  nx: string;
+  @Prop()
+  ny: string;
 
   // 기타 환경
   @Prop()

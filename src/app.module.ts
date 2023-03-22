@@ -6,8 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GpsModule } from './gps/gps.module';
 import { LocationModule } from './location/location.module';
-import { SslModule } from './ssl/ssl.module';
-import { SsfModule } from './ssf/ssf.module';
 
 @Module({
   imports: [
@@ -16,8 +14,6 @@ import { SsfModule } from './ssf/ssf.module';
     MongooseModule.forRoot(
       process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017',
     ),
-    SslModule,
-    SsfModule,
   ],
   controllers: [AppController],
   providers: [AppService],

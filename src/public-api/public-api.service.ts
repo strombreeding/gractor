@@ -100,8 +100,7 @@ import { StfRepository } from './STF.repo';
 // };
 @Injectable()
 export class PublicApiService {
-  private interval = this.getLocations();
-  // private interval = setInterval(() => this.getLocations(), 10000);
+  private interval = setInterval(() => this.getLocations(), 600000);
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
   private serviceKey = process.env.SERVICE_KEY;
@@ -113,14 +112,25 @@ export class PublicApiService {
     private stfRepo: StfRepository,
   ) {}
 
+  async getSslData(Do: string, si?: string, vilage?: string) {
+    const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
+    console.log(nx, ny);
+    const now = utils.getDate();
+    const ssl = await this.sslRepo.getSslDatas(nx, ny, now);
+    return ssl;
+  }
+
+  /**등록지역 좌표 구한후, 공공API 요청을 시작하는 함수실행 */
   async getLocations() {
     const locationArr = await (
       await this.locationService.getAllLocations()
     ).xyWorking;
-    console.log(locationArr);
+    console.log('등록 지역 개수:', locationArr.length);
     this.reqAndDB(locationArr);
     return locationArr;
   }
+
+  /**좌표목록 받아서 수집가능한 목록에한하여 수집 시작 */
   async reqAndDB(workingLocationArr): Promise<void> {
     // 대기 예보 시간대
     const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
@@ -137,52 +147,48 @@ export class PublicApiService {
     );
 
     // // SSL 요청
-    // if (nowMinutes > 41) {
-    //   //
-    //   // ...SSL API 요청 및 DB 저장 로직
-    //   for (let i = 0; i < workingLocationArr.length; i++) {
-    //     await this.reqOpenApi(
-    //       this.baseUrl,
-    //       'getUltraSrtNcst',
-    //       this.serviceKey,
-    //       workingLocationArr[i].split(','),
-    //       now.nowTime,
-    //       now.nowDate,
-    //     );
-    //   }
-    // }
-    // //   // SSF 요청
-    // if (nowMinutes > 46) {
-    //   //
-    //   for (let i = 0; i < workingLocationArr.length; i++) {
-    //     await this.reqOpenApi(
-    //       this.baseUrl,
-    //       'getUltraSrtFcst',
-    //       this.serviceKey,
-    //       workingLocationArr[i].split(','),
-    //       now.nowTime,
-    //       now.nowDate,
-    //     );
-    //   }
-    //   // ...SSF API 요청 및 DB 저장 로직
-    // }
-    //   // STF 요청
-    if (nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours)) {
-      //
-      // ...STF API 요청 및 DB 저장 로직
+    if (nowMinutes > 41) {
+      for (let i = 0; i < workingLocationArr.length; i++) {
+        await this.reqOpenApi(
+          this.baseUrl,
+          'getUltraSrtNcst',
+          this.serviceKey,
+          workingLocationArr[i].split(','),
+          now.nowTime,
+          now.nowDate,
+        );
+      }
     }
-    console.log(now.nowTime, now.nowDate);
-    for (let i = 0; i < workingLocationArr.length; i++) {
-      await this.reqOpenApi(
-        this.baseUrl,
-        'getVilageFcst',
-        this.serviceKey,
-        workingLocationArr[i].split(','),
-        now.nowTime,
-        now.nowDate,
-      );
+
+    // SSF 요청
+    if (nowMinutes > 46) {
+      for (let i = 0; i < workingLocationArr.length; i++) {
+        await this.reqOpenApi(
+          this.baseUrl,
+          'getUltraSrtFcst',
+          this.serviceKey,
+          workingLocationArr[i].split(','),
+          now.nowTime,
+          now.nowDate,
+        );
+      }
+    }
+    // STF 요청
+    if (nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours)) {
+      for (let i = 0; i < workingLocationArr.length; i++) {
+        await this.reqOpenApi(
+          this.baseUrl,
+          'getVilageFcst',
+          this.serviceKey,
+          workingLocationArr[i].split(','),
+          now.nowTime,
+          now.nowDate,
+        );
+      }
     }
   }
+
+  /**reqAndDB 가 부르는 함수 DB에 저장하는 역할 */
   async reqOpenApi(
     baseUrl: string,
     functionType: string,
@@ -201,44 +207,35 @@ export class PublicApiService {
     if (!acceptFunction.includes(functionType))
       throw new HttpException('상세기능이아님', HttpStatus.BAD_REQUEST);
     const query = `${baseUrl}${functionType}?serviceKey=${serviceKey}&numOfRows=1000&pageNo=1&base_date=${nowDate}&base_time=${nowTime}&nx=${workingGPS[0]}&ny=${workingGPS[1]}&dataType=JSON`;
-    console.log(query);
     const dataArr = await (
       await axios.get(query)
     ).data.response.body.items.item;
-    console.log(dataArr.length, '데이터 길이');
     switch (functionType) {
       case acceptFunction[0]:
-        await this.sslRepo.create(dataArr);
+        await this.sslRepo.create(dataArr, workingGPS);
         break;
       case acceptFunction[1]:
-        await this.ssfRepo.create(dataArr);
+        await this.ssfRepo.create(dataArr, workingGPS);
         break;
       case acceptFunction[2]:
-        await this.stfRepo.create(dataArr);
+        await this.stfRepo.create(dataArr, workingGPS);
         break;
     }
-    console.log(dataArr.length, ' stf데이터의 길이');
-
     console.log('작업끝');
   }
 
+  /** 수집 시작/중지 */
   async toggle(control: string) {
-    const zz = await this.locationService.getAllLocations();
-    console.log(zz);
-    // const locationArr = (await this.locationService.getAllLocations())
-    //   .xyWorking;
-    // reqAndDB(locationArr, this.baseUrl, this.serviceKey);
-
-    // if (control === 'start' && this.isWorking === 0) {
-    //   console.log(control);
-    //   this.interval = setInterval(this.getLocations, 1000);
-    //   this.isWorking = 1;
-    //   return '수집 시작';
-    // } else if (control === 'end' && this.isWorking === 1) {
-    //   console.log(control);
-    //   clearInterval(this.interval);
-    //   this.isWorking = 0;
-    //   return '수집 종료';
-    // }
+    if (control === 'start' && this.isWorking === 0) {
+      console.log(control);
+      this.interval = setInterval(() => this.getLocations(), 5000);
+      this.isWorking = 1;
+      return '수집 시작';
+    } else if (control === 'end' && this.isWorking === 1) {
+      console.log(control);
+      clearInterval(this.interval);
+      this.isWorking = 0;
+      return '수집 종료';
+    }
   }
 }
