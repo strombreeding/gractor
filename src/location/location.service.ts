@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { HttpStatusCode } from 'axios';
 import { Model } from 'mongoose';
 import { Location, LocationDocument } from './schemas/location.schema';
 
@@ -34,5 +35,23 @@ export class LocationService {
     }
   }
 
-  async deleteLocation(xyArr) {}
+  async deleteLocation(xyArr: string[]) {
+    const [x, y] = xyArr;
+    const stringXY = `${x},${y}`;
+    const location = (await this.locationModel.find({}))[0];
+    console.log(location.xyWorking.includes(stringXY));
+    if (!location || !location.xyWorking.includes(stringXY))
+      throw new HttpException('데이터가 비어있습니다', HttpStatusCode.NotFound);
+    for (let i = 0; i < location.xyWorking.length; i++) {
+      if (location.xyWorking[i] === stringXY) {
+        location.xyWorking.splice(i, 1);
+        await this.locationModel.updateOne(
+          { _id: location._id },
+          { $set: location },
+        );
+        break;
+      }
+    }
+    return location;
+  }
 }

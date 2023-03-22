@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GpsService } from 'src/gps/gps.service';
-import { InsertLocationDto } from './dto/insert.dto';
+import { LocationDto } from './dto/insert.dto';
 import { LocationService } from './location.service';
 import { Location } from './schemas/location.schema';
 
@@ -24,7 +24,7 @@ export class LocationController {
     type: Location,
   })
   @Post()
-  async insertLocation(@Body() body: InsertLocationDto) {
+  async insertLocation(@Body() body: LocationDto) {
     const { Do, si, vilage } = body;
     const gps = await this.gpsService.getGps(Do, si, vilage);
     const stringXY = [gps.nx, gps.ny];
@@ -43,9 +43,11 @@ export class LocationController {
     type: Location,
   })
   @Delete()
-  async deleteLocation() {
-    const a = ['1', '2'];
-    const result = await this.locationService.insertLocation(a);
+  async deleteLocation(@Body() body: LocationDto) {
+    const { Do, si, vilage } = body;
+    const gps = await this.gpsService.getGps(Do, si, vilage);
+    const stringXY = [gps.nx, gps.ny];
+    const result = await this.locationService.deleteLocation(stringXY);
     return result;
   }
 }

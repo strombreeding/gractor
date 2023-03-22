@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger/dist/decorators/api-property.decorator';
 
-export class InsertLocationDto {
+export class LocationDto {
   @ApiProperty({
     example: '서울특별시',
     description: 'Do',
