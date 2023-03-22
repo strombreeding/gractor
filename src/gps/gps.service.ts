@@ -27,4 +27,9 @@ export class GpsService {
     const gps = await this.gpsRepo.getGps(Do, si, vilage);
     return gps;
   }
+
+  async getLocations(gps) {
+    const zz = await this.gpsRepo.gpsToLocations(gps);
+    return zz;
+  }
 }

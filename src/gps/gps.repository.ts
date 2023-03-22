@@ -10,6 +10,38 @@ export class GpsRepository {
     private gpsModel: Model<GpsDocument>,
   ) {}
 
+  async gpsToLocations(gps: any) {
+    const stringXY = [gps.nx, gps.ny];
+    const arr = await this.gpsModel.find({
+      etc: { $elemMatch: { nx: gps.nx, ny: gps.ny } },
+    });
+    const document = await this.gpsModel.find({ defaultXY: stringXY });
+    const result = {
+      Do: [],
+      si: [],
+      vilages: [],
+    };
+    document.map((xx) => {
+      if (!result.Do.includes(xx.do)) {
+        result.Do.push(xx.do);
+      }
+      if (!result.si.includes(xx.si)) {
+        result.si.push(xx.si);
+      }
+    });
+    arr.map((xx) => {
+      console.log(xx.etc);
+      xx.etc.map((etc) => {
+        if (etc.nx === gps.nx && etc.ny === gps.ny) {
+          result.vilages.push(etc.vilage);
+        }
+      });
+      // if (xx.nx === gps.nx && xx.ny === gps.ny) {
+      // }
+    });
+    return result;
+  }
+
   async getGps(Do: string, si?: string, vilageName?: string) {
     const findFilter = {
       ...(Do && { do: Do }),

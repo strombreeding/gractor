@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger/dist/decorators/api-property.decorator';
 
-export class LocationDto {
+export class GpsDto {
   @ApiProperty({
     example: '서울특별시',
     description: 'Do',
@@ -12,13 +12,13 @@ export class LocationDto {
     description: 'si',
     required: false,
   })
-  si: string | null;
+  si: string;
 
   @ApiProperty({
     example: '성현동 or 데이터입력 X',
     description: 'vilage',
     required: false,
   })
-  vilage: string | null;
+  vilage: string;
 }
 //

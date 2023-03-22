@@ -18,6 +18,16 @@ export class Location {
   updatedAt: Date;
 
   // 일중인 좌표
+  @ApiProperty({ description: '수행중인 도' })
+  @Prop()
+  do: string[];
+  @ApiProperty({ description: '수행중인 시' })
+  @Prop()
+  si: string[];
+  @ApiProperty({ description: '수행중인 동읍면' })
+  @Prop()
+  vilage: string[];
+  // 일중인 좌표
   @ApiProperty({ description: '수행중인 좌표값' })
   @Prop()
   xyWorking: string[];
