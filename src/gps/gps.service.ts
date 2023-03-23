@@ -12,10 +12,12 @@ export class GpsService {
   constructor(private gpsRepo: GpsRepository) {}
 
   async insertData() {
+    console.log('접근완료');
     const datas = await this.googleSheet.spreadsheets.values.get({
       spreadsheetId: '15DSBFCgs_6eULe_HagEo4ZWKUOT6INvV6KJtuTOpQfE',
       range: `1!B2:F3793`,
     });
+    console.log(datas.data.values, '완료!');
     await this.gpsRepo.isertData(datas.data.values);
     return;
   }

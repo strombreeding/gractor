@@ -46,8 +46,12 @@ export class LocationController {
   })
   @Get('/all')
   async getAllLocations() {
-    const result = await this.locationService.getAllLocations();
-    return result;
+    try {
+      const result = await this.locationService.getAllLocations();
+      return result;
+    } catch (err) {
+      throw new Error();
+    }
   }
   //
 
@@ -64,13 +68,17 @@ export class LocationController {
   @Get()
   async getLocations(@Query() query: LocationDto) {
     const { Do, si, vilage } = query;
-    const gps = await this.gpsService.getGps(Do, si, vilage);
-    const arr = await this.locationService.getWorkingLocation(gps);
-    const result = {
-      gps: gps,
-      locations: arr,
-    };
-    return result;
+    try {
+      const gps = await this.gpsService.getGps(Do, si, vilage);
+      const arr = await this.locationService.getWorkingLocation(gps);
+      const result = {
+        gps: gps,
+        locations: arr,
+      };
+      return result;
+    } catch (err) {
+      throw new Error();
+    }
   }
   //
 
@@ -87,12 +95,14 @@ export class LocationController {
   @Post()
   async insertLocation(@Body() body: LocationDto) {
     const { Do, si, vilage } = body;
-    if (si || vilage) {
+    try {
+      const gps = await this.gpsService.getGps(Do, si, vilage);
+      const stringXY = [gps.nx, gps.ny];
+      const result = await this.locationService.insertLocation(stringXY, gps);
+      return result;
+    } catch (err) {
+      throw new Error();
     }
-    const gps = await this.gpsService.getGps(Do, si, vilage);
-    const stringXY = [gps.nx, gps.ny];
-    const result = await this.locationService.insertLocation(stringXY, gps);
-    return result;
     // return 'zz';
   }
   //
@@ -110,10 +120,14 @@ export class LocationController {
   @Delete()
   async deleteLocation(@Body() body: LocationDto) {
     const { Do, si, vilage } = body;
-    const gps = await this.gpsService.getGps(Do, si, vilage);
-    const stringXY = [gps.nx, gps.ny];
-    const result = await this.locationService.deleteLocation(stringXY, gps);
-    return result;
+    try {
+      const gps = await this.gpsService.getGps(Do, si, vilage);
+      const stringXY = [gps.nx, gps.ny];
+      const result = await this.locationService.deleteLocation(stringXY, gps);
+      return result;
+    } catch (err) {
+      throw new Error();
+    }
   }
   //
 }
