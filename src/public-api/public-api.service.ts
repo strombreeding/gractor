@@ -11,7 +11,7 @@ import { StfRepository } from './STF.repo';
 export class PublicApiService {
   private interval = setInterval(() => {
     this.getLocations();
-  }, 300000);
+  }, 60000);
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
   private serviceKey = process.env.SERVICE_KEY;
