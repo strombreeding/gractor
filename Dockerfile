@@ -4,12 +4,12 @@ RUN mkdir -p /app
 
 WORKDIR /app
 
-COPY . .
+COPY package.json package-lock.json ./
 
 RUN npm ci
 RUN npm run build
 
-EXPOSE 3000
+COPY . .
 ENTRYPOINT ["node","dist/main.js"]
 
 
