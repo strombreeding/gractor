@@ -165,7 +165,7 @@ export const getDate = () => {
   }
 
   const result = {
-    nowDate: `${nowYear}${nowMonth}${new Date().getDate()}`,
+    nowDate: `${nowYear}${nowMonth}${new Date(KoreaHour).getDate()}`,
     nowTime: nowHours + '00',
     nowHours,
   };

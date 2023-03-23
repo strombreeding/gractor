@@ -17,7 +17,7 @@ const worked = {
 export class PublicApiService {
   private interval = setInterval(() => {
     this.reqAndDB();
-  }, 300000);
+  }, 5000);
 
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
@@ -67,6 +67,7 @@ export class PublicApiService {
   /**좌표목록 받아서 수집가능한 목록에한하여 수집 시작 */
   async reqAndDB(): Promise<void> {
     try {
+      console.log('현재 작업상태', worked);
       if (worked.stf === true) worked.stf = false;
       const workingLocationArr = (await this.locationService.getAllLocations())
         .xyWorking;
@@ -166,10 +167,13 @@ export class PublicApiService {
     if (!acceptFunction.includes(functionType))
       throw new HttpException('상세기능이아님', HttpStatus.BAD_REQUEST);
     const query = `${baseUrl}${functionType}?serviceKey=${serviceKey}&numOfRows=1000&pageNo=1&base_date=${nowDate}&base_time=${nowTime}&nx=${workingGPS[0]}&ny=${workingGPS[1]}&dataType=JSON`;
-    const dataArr = await (
-      await axios.get(query)
-    ).data.response.body.items.item;
     try {
+      const openData = await axios.get(query);
+      const isSuccess = openData.data.response.header.resultCode === '00';
+      if (!isSuccess) {
+        throw new CustomError(`데이터 수집 실패:${query}`, 500);
+      }
+      const dataArr = openData.data.response.body.items.item;
       switch (functionType) {
         case acceptFunction[0]:
           await this.sslRepo.create(dataArr, workingGPS);
