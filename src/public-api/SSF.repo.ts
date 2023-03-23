@@ -20,8 +20,26 @@ export class SsfRepository {
     @InjectModel(Ssf.name)
     private ssfModel: Model<SsfDocument>,
   ) {}
+
+  async getSsfDatas(
+    nx: string,
+    ny: string,
+    now: {
+      nowDate: string;
+      nowTime: string;
+      nowHours: string;
+    },
+  ) {
+    const data = await this.ssfModel.find({
+      nx,
+      ny,
+      openDate: { $gte: now.nowDate },
+      openTime: { $gte: now.nowTime },
+    });
+    return data;
+  }
+
   async create(data: SsfType[], gps: any) {
-    console.log(data.length);
     const a = [];
     for (let i = 0; i < 6; i++) {
       let newSsf = {

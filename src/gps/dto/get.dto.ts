@@ -4,6 +4,7 @@ export class GpsDto {
   @ApiProperty({
     example: '서울특별시',
     description: 'Do',
+    required: false,
   })
   Do: string;
 

@@ -16,7 +16,6 @@ export class GpsService {
       spreadsheetId: '15DSBFCgs_6eULe_HagEo4ZWKUOT6INvV6KJtuTOpQfE',
       range: `1!B2:F3793`,
     });
-    console.log(datas.data.values);
     await this.gpsRepo.isertData(datas.data.values);
     return;
   }

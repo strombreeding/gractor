@@ -14,6 +14,8 @@ import { ToggleDto } from './dto/toggle.dto';
 import { PublicApiService } from './public-api.service';
 import { Ssl } from './schemas/SSL.schema';
 import * as utils from '../utils/utils';
+import { Stf } from './schemas/STF.schema';
+import { Ssf } from './schemas/SSF.schema';
 
 @Controller('public-api')
 @ApiTags('공공데이터 수집정지/가동 및 데이터 열람')
@@ -21,7 +23,8 @@ export class PublicApiController {
   constructor(private apiService: PublicApiService) {}
   @ApiOperation({
     summary: '초단기 실황 조회 ',
-    description: '현재 시간기준으로 데이터를 가져옵니다. ',
+    description:
+      '현재 시간기준으로 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요.',
   })
   @ApiCreatedResponse({
     status: 200,
@@ -35,30 +38,32 @@ export class PublicApiController {
   }
   @ApiOperation({
     summary: '초단기 예보 조회 ',
-    description: '현재 시간기준으로 6시간 이후까지의 데이터를 가져옵니다. ',
+    description:
+      '현재 시간기준으로 6시간 이후까지의 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요. ',
   })
   @ApiCreatedResponse({
     status: 200,
-    type: Ssl,
+    type: Ssf,
   })
   @Get('/ssf')
   async getSSF(@Query() query: SslDto) {
     const { Do, si, vilage } = query;
-    const result = await this.apiService.getSslData(Do, si, vilage);
+    const result = await this.apiService.getSsfData(Do, si, vilage);
     return result;
   }
   @ApiOperation({
     summary: '단기 예보 조회 ',
-    description: '현재 시간기준으로 최대 3일 이후까지의 데이터를 가져옵니다. ',
+    description:
+      '현재 시간기준으로 최대 3일 이후까지의 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요. ',
   })
   @ApiCreatedResponse({
     status: 200,
-    type: Ssl,
+    type: Stf,
   })
   @Get('/stf')
   async getSTF(@Query() query: SslDto) {
     const { Do, si, vilage } = query;
-    const result = await this.apiService.getSslData(Do, si, vilage);
+    const result = await this.apiService.getStfData(Do, si, vilage);
     return result;
   }
   //

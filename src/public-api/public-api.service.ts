@@ -7,100 +7,11 @@ import { SsfRepository } from './SSF.repo';
 import { SslRepository } from './SSL.repo';
 import { StfRepository } from './STF.repo';
 
-// const reqAndDB = async (
-//   workingLocationArr,
-//   baseUrl,
-//   serviceKey,
-// ): Promise<void> => {
-//   // 대기 예보 시간대
-//   const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
-
-//   // 현재 시간과 분을 구하는 것
-//   const nowMinutes = new Date().getMinutes();
-//   const now = utils.getDate();
-
-//   console.log(workingLocationArr);
-//   console.log(`SSL 요청 가능여부 : `, nowMinutes > 41);
-//   console.log(`SSF 요청 가능여부 : `, nowMinutes > 46);
-//   console.log(
-//     `STF 요청 가능여부 : `,
-//     nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours),
-//   );
-
-//   console.log('=======================');
-//   console.log('======');
-//   // SSL 요청
-//   if (nowMinutes > 41) {
-//     //
-//     // ...SSL API 요청 및 DB 저장 로직
-//     for (let i = 0; i < workingLocationArr.length; i++) {
-//       reqOpenApi(
-//         baseUrl,
-//         'getUltraSrtNcst',
-//         serviceKey,
-//         workingLocationArr[i].split(','),
-//         now.nowTime,
-//         now.nowDate,
-//       );
-//     }
-//   }
-//   //   // SSF 요청
-//   if (nowMinutes > 46) {
-//     //
-//     // ...SSF API 요청 및 DB 저장 로직
-//     for (let i = 0; i < workingLocationArr.length; i++) {
-//       reqOpenApi(
-//         baseUrl,
-//         'getUltraSrtFcst',
-//         serviceKey,
-//         workingLocationArr[i].split(','),
-//         now.nowTime,
-//         now.nowDate,
-//       );
-//     }
-//   }
-//   //   // STF 요청
-//   if (nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours)) {
-//     //
-//     // ...STF API 요청 및 DB 저장 로직
-//   }
-//   console.log(now.nowTime, now.nowDate);
-//   for (let i = 0; i < workingLocationArr.length; i++) {
-//     reqOpenApi(
-//       baseUrl,
-//       'getVilageFcst',
-//       serviceKey,
-//       workingLocationArr[i].split(','),
-//       now.nowTime,
-//       now.nowDate,
-//     );
-//   }
-// };
-
-// export const reqOpenApi = async (
-//   baseUrl: string,
-//   functionType: string,
-//   serviceKey: string,
-//   workingGPS: Array<any>,
-//   nowTime: string,
-//   nowDate: string,
-// ) => {
-//   const acceptFunction = [
-//     'getUltraSrtNcst',
-//     'getUltraSrtFcst',
-//     'getVilageFcst',
-//   ];
-//   // workingGPS.join('/,');
-//   console.log(workingGPS);
-//   if (!acceptFunction.includes(functionType))
-//     throw new HttpException('상세기능이아님', HttpStatus.BAD_REQUEST);
-//   const query = `${baseUrl}${functionType}?serviceKey=${serviceKey}&numOfRows=1000&pageNo=1&base_date=${nowDate}&base_time=${nowTime}&nx=${workingGPS[0]}&ny=${workingGPS[1]}&dataType=JSON`;
-//   const data = await (await axios.get(query)).data.response;
-//   console.log(data);
-// };
 @Injectable()
 export class PublicApiService {
-  private interval = setInterval(() => this.getLocations(), 600000);
+  private interval = setInterval(() => {
+    this.getLocations();
+  }, 300000);
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
   private serviceKey = process.env.SERVICE_KEY;
@@ -119,6 +30,20 @@ export class PublicApiService {
     const ssl = await this.sslRepo.getSslDatas(nx, ny, now);
     return ssl;
   }
+  async getSsfData(Do: string, si?: string, vilage?: string) {
+    const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
+    console.log(nx, ny);
+    const now = utils.getDate();
+    const ssf = await this.ssfRepo.getSsfDatas(nx, ny, now);
+    return ssf;
+  }
+  async getStfData(Do: string, si?: string, vilage?: string) {
+    const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
+    console.log(nx, ny);
+    const now = utils.getDate();
+    const stf = await this.stfRepo.getStfDatas(nx, ny, now);
+    return stf;
+  }
 
   /**등록지역 좌표 구한후, 공공API 요청을 시작하는 함수실행 */
   async getLocations() {
@@ -126,7 +51,15 @@ export class PublicApiService {
       await this.locationService.getAllLocations()
     ).xyWorking;
     console.log('등록 지역 개수:', locationArr.length);
-    this.reqAndDB(locationArr);
+    try {
+      this.reqAndDB(locationArr);
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        '문제가 생겼습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
     return locationArr;
   }
 

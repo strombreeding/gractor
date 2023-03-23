@@ -13,6 +13,8 @@ export class LocationService {
     private gpsService: GpsService,
   ) {}
 
+  async getIndependency() {}
+
   async getAllLocations() {
     const locations = (await this.locationModel.find({}))[0];
     const result = {
@@ -33,7 +35,6 @@ export class LocationService {
     const stringXY = `${x},${y}`;
     const aleardyLocation = (await this.locationModel.find({}))[0];
     const locationsArr = await this.getWorkingLocation(gps);
-    console.log(aleardyLocation);
     if (!aleardyLocation) {
       const toCreate = {
         xyWorking: stringXY,
@@ -65,6 +66,7 @@ export class LocationService {
     } else {
       return '이미 추가된 지역입니다.';
     }
+    return locationsArr;
   }
 
   async deleteLocation(xyArr: string[], gps: any) {
@@ -72,7 +74,6 @@ export class LocationService {
     const stringXY = `${x},${y}`;
     const aleardyLocation = (await this.locationModel.find({}))[0];
     const workingArr = await this.gpsService.getLocations(gps);
-    console.log(aleardyLocation.xyWorking.includes(stringXY));
     if (!aleardyLocation || !aleardyLocation.xyWorking.includes(stringXY))
       throw new HttpException('데이터가 비어있습니다', HttpStatusCode.NotFound);
     // const a = await this.gpsService.getGps(gps.do, gps.si, gps.vilage);

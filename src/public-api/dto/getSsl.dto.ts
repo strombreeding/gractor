@@ -4,6 +4,7 @@ export class SslDto {
   @ApiProperty({
     example: '서울특별시',
     description: 'Do',
+    required: false,
   })
   Do: string;
 

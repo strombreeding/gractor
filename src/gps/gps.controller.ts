@@ -7,11 +7,11 @@ import { GpsService } from './gps.service';
 export class GpsController {
   constructor(private gpsService: GpsService) {}
 
-  @Get('/insert')
-  async insertData() {
-    const result = await this.gpsService.insertData();
-    return result;
-  }
+  // @Get('/insert')
+  // async insertData() {
+  //   const result = await this.gpsService.insertData();
+  //   return result;
+  // }
 
   @Get('/')
   async gps(@Query() query: GpsDto) {

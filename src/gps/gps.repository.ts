@@ -23,15 +23,14 @@ export class GpsRepository {
       vilages: [],
     };
     document.map((xx) => {
-      if (!result.Do.includes(xx.do)) {
+      if (!result.Do.includes(xx.do) && gps.do) {
         result.Do.push(xx.do);
       }
-      if (!result.si.includes(xx.si)) {
+      if (!result.si.includes(xx.si) && xx.si !== '') {
         result.si.push(xx.si);
       }
     });
     arr.map((xx) => {
-      console.log(xx.etc);
       xx.etc.map((etc) => {
         if (etc.nx === gps.nx && etc.ny === gps.ny) {
           result.vilages.push(etc.vilage);
@@ -78,7 +77,6 @@ export class GpsRepository {
         }
       });
     }
-    // console.log(result);
     return result;
     // return gps;
   }

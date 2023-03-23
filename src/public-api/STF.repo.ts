@@ -22,6 +22,27 @@ export class StfRepository {
     @InjectModel(Stf.name)
     private stfModel: Model<StfDocument>,
   ) {}
+
+  async getStfDatas(
+    nx: string,
+    ny: string,
+    now: {
+      nowDate: string;
+      nowTime: string;
+      nowHours: string;
+    },
+  ) {
+    console.log('들어오긴하니?');
+    console.log(nx, nx, now, '??');
+    const data = await this.stfModel.find({
+      nx,
+      ny,
+      openDate: { $gte: now.nowDate },
+      openTime: { $gte: now.nowTime },
+    });
+    return data;
+  }
+
   async create(data: StfType[], gps: any) {
     for (let i = 0; i < data.length; ) {
       if (i >= data.length) break;
@@ -85,7 +106,7 @@ export class StfRepository {
 
       // 예보날짜에 최고, 최저기온 있을시 업데이트
       if (newStf.heightTemp !== '') {
-        console.log('최고기온 발견 !');
+        console.log('최고기온 찾음', newStf);
         await this.stfModel.updateMany(
           {
             openDate: newStf.openDate,
@@ -99,7 +120,7 @@ export class StfRepository {
         );
       }
       if (newStf.lowTemp !== '') {
-        console.log('최저기온 발견 !');
+        console.log('최저기온 찾음', newStf);
         await this.stfModel.updateMany(
           {
             openDate: newStf.openDate,
