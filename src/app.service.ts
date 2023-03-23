@@ -3,7 +3,7 @@ import axios from 'axios';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+  getHello(): Date {
+    return new Date();
   }
 }
