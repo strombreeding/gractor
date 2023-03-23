@@ -17,7 +17,7 @@ const worked = {
 export class PublicApiService {
   private interval = setInterval(() => {
     this.reqAndDB();
-  }, 5000);
+  }, 300000);
 
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
