@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { CustomError } from 'src/error/custom.error';
 import { GpsService } from 'src/gps/gps.service';
 import { LocationService } from 'src/location/location.service';
 import * as utils from '../utils/utils';
@@ -7,11 +8,17 @@ import { SsfRepository } from './SSF.repo';
 import { SslRepository } from './SSL.repo';
 import { StfRepository } from './STF.repo';
 
+const worked = {
+  ssl: false,
+  ssf: false,
+  stf: false,
+};
 @Injectable()
 export class PublicApiService {
   private interval = setInterval(() => {
-    this.getLocations();
-  }, 60000);
+    this.reqAndDB();
+  }, 300000);
+
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
   private serviceKey = process.env.SERVICE_KEY;
@@ -31,7 +38,7 @@ export class PublicApiService {
       const ssl = await this.sslRepo.getSslDatas(nx, ny, now);
       return ssl;
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
     }
   }
   async getSsfData(Do: string, si?: string, vilage?: string) {
@@ -42,7 +49,7 @@ export class PublicApiService {
       const ssf = await this.ssfRepo.getSsfDatas(nx, ny, now);
       return ssf;
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
     }
   }
   async getStfData(Do: string, si?: string, vilage?: string) {
@@ -53,41 +60,29 @@ export class PublicApiService {
       const stf = await this.stfRepo.getStfDatas(nx, ny, now);
       return stf;
     } catch (err) {
-      console.log(err.message);
-    }
-  }
-
-  /**등록지역 좌표 구한후, 공공API 요청을 시작하는 함수실행 */
-  async getLocations() {
-    try {
-      const locationArr = await (
-        await this.locationService.getAllLocations()
-      ).xyWorking;
-      console.log('등록 지역 개수:', locationArr.length);
-      try {
-        this.reqAndDB(locationArr);
-      } catch (err) {
-        console.log(err);
-        throw new HttpException(
-          '문제가 생겼습니다.',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-      return locationArr;
-    } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
     }
   }
 
   /**좌표목록 받아서 수집가능한 목록에한하여 수집 시작 */
-  async reqAndDB(workingLocationArr): Promise<void> {
+  async reqAndDB(): Promise<void> {
+    if (worked.stf === true) worked.stf = false;
+    const workingLocationArr = (await this.locationService.getAllLocations())
+      .xyWorking;
     // 대기 예보 시간대
     const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
 
     // 현재 시간과 분을 구하는 것
-    const nowMinutes = new Date().getMinutes();
+    const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
+    const nowMinutes = new Date(KoreaHour).getMinutes();
     const now = utils.getDate();
 
+    console.log(
+      '현재 시간 : ',
+      now.nowDate,
+      now.nowHours,
+      new Date().getMinutes(),
+    );
     console.log(`SSL 요청 가능여부 : `, nowMinutes > 41);
     console.log(`SSF 요청 가능여부 : `, nowMinutes > 46);
     console.log(
@@ -95,7 +90,7 @@ export class PublicApiService {
       nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours),
     );
     try {
-      if (nowMinutes > 41) {
+      if (nowMinutes > 41 && worked.ssl === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
           await this.reqOpenApi(
             this.baseUrl,
@@ -106,10 +101,11 @@ export class PublicApiService {
             now.nowDate,
           );
         }
+        worked.ssl = true;
       }
 
       // SSF 요청
-      if (nowMinutes > 46) {
+      if (nowMinutes > 46 && worked.ssf === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
           await this.reqOpenApi(
             this.baseUrl,
@@ -120,9 +116,14 @@ export class PublicApiService {
             now.nowDate,
           );
         }
+        worked.ssf = true;
       }
       // STF 요청
-      if (nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours)) {
+      if (
+        nowMinutes > 11 &&
+        acceptHoursOfSTF.includes(now.nowHours) &&
+        worked.stf === false
+      ) {
         for (let i = 0; i < workingLocationArr.length; i++) {
           await this.reqOpenApi(
             this.baseUrl,
@@ -133,9 +134,15 @@ export class PublicApiService {
             now.nowDate,
           );
         }
+        worked.stf = true;
+      }
+      // 전부 했을경우
+      if (worked.ssf === true && worked.ssl === true) {
+        worked.ssf = false;
+        worked.ssl = false;
       }
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
     }
     // // SSL 요청
   }
@@ -176,7 +183,10 @@ export class PublicApiService {
       }
       console.log('작업끝');
     } catch (err) {
-      console.log(err.message);
+      if (!err.options === false) {
+        throw new CustomError(err.message, err.status);
+      }
+      throw new Error();
     }
   }
 
@@ -184,7 +194,7 @@ export class PublicApiService {
   async toggle(control: string) {
     if (control === 'start' && this.isWorking === 0) {
       console.log(control);
-      this.interval = setInterval(() => this.getLocations(), 5000);
+      this.interval = setInterval(() => this.reqAndDB(), 5000);
       this.isWorking = 1;
       return '수집 시작';
     } else if (control === 'end' && this.isWorking === 1) {

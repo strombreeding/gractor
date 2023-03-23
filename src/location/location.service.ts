@@ -1,7 +1,8 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { HttpStatusCode } from 'axios';
 import { Model } from 'mongoose';
+import { CustomError } from 'src/error/custom.error';
 import { GpsService } from 'src/gps/gps.service';
 import { Location, LocationDocument } from './schemas/location.schema';
 
@@ -12,9 +13,6 @@ export class LocationService {
     private locationModel: Model<LocationDocument>,
     private gpsService: GpsService,
   ) {}
-
-  async getIndependency() {}
-
   async getAllLocations() {
     try {
       const locations = (await this.locationModel.find({}))[0];
@@ -26,12 +24,16 @@ export class LocationService {
       };
       return result;
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
     }
   }
   async getWorkingLocation(gps) {
-    const locations = await this.gpsService.getLocations(gps);
-    return locations;
+    try {
+      const locations = await this.gpsService.getLocations(gps);
+      return locations;
+    } catch (err) {
+      throw new Error(err.message);
+    }
   }
 
   async insertLocation(xyArr: string[], gps: any) {
@@ -71,9 +73,8 @@ export class LocationService {
       } else {
         return '이미 추가된 지역입니다.';
       }
-      return locationsArr;
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
     }
   }
 
@@ -84,10 +85,7 @@ export class LocationService {
       const aleardyLocation = (await this.locationModel.find({}))[0];
       const workingArr = await this.gpsService.getLocations(gps);
       if (!aleardyLocation || !aleardyLocation.xyWorking.includes(stringXY))
-        throw new HttpException(
-          '데이터가 비어있습니다',
-          HttpStatusCode.NotFound,
-        );
+        throw new CustomError('데이터가 비어있습니다', 404);
       // const a = await this.gpsService.getGps(gps.do, gps.si, gps.vilage);
 
       const targetLocation = deleteLocation(aleardyLocation, workingArr);
@@ -106,6 +104,10 @@ export class LocationService {
       );
       return aleardyLocation;
     } catch (err) {
+      if (!err.options === false) {
+        throw new CustomError(err.message, 404);
+      }
+      throw new Error();
       console.log(err.message);
     }
   }

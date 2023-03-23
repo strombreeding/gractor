@@ -3,12 +3,16 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Query,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { customError } from 'src/error/custom.error';
 import { GpsService } from 'src/gps/gps.service';
+import { Logger } from 'winston';
 import { LocationDto } from './dto/insert.dto';
 import { LocationService } from './location.service';
 import { Location } from './schemas/location.schema';
@@ -19,21 +23,10 @@ export class LocationController {
   constructor(
     private locationService: LocationService,
     private gpsService: GpsService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private logger: Logger,
   ) {}
 
-  @ApiOperation({
-    summary: '수집중인 모든 지역 확인',
-    description: '수집중인 모든지역의 지명 과 좌표 반환',
-  })
-  @ApiCreatedResponse({
-    status: 200,
-    type: Location,
-  })
-  @Get('/independency')
-  async getIndependencyLocations() {
-    const result = await this.locationService.getIndependency();
-    return result;
-  }
   //
 
   @ApiOperation({
@@ -50,7 +43,7 @@ export class LocationController {
       const result = await this.locationService.getAllLocations();
       return result;
     } catch (err) {
-      throw new Error();
+      throw customError(err, this.logger);
     }
   }
   //
@@ -77,7 +70,7 @@ export class LocationController {
       };
       return result;
     } catch (err) {
-      throw new Error();
+      throw customError(err, this.logger);
     }
   }
   //
@@ -101,7 +94,7 @@ export class LocationController {
       const result = await this.locationService.insertLocation(stringXY, gps);
       return result;
     } catch (err) {
-      throw new Error();
+      throw customError(err, this.logger);
     }
     // return 'zz';
   }
@@ -126,7 +119,7 @@ export class LocationController {
       const result = await this.locationService.deleteLocation(stringXY, gps);
       return result;
     } catch (err) {
-      throw new Error();
+      throw customError(err, this.logger);
     }
   }
   //

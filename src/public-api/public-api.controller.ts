@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Query,
@@ -16,11 +17,18 @@ import { Ssl } from './schemas/SSL.schema';
 import * as utils from '../utils/utils';
 import { Stf } from './schemas/STF.schema';
 import { Ssf } from './schemas/SSF.schema';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { customError } from 'src/error/custom.error';
 
 @Controller('public-api')
 @ApiTags('공공데이터 수집정지/가동 및 데이터 열람')
 export class PublicApiController {
-  constructor(private apiService: PublicApiService) {}
+  constructor(
+    private apiService: PublicApiService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private logger: Logger,
+  ) {}
   @ApiOperation({
     summary: '초단기 실황 조회 ',
     description:
@@ -33,8 +41,12 @@ export class PublicApiController {
   @Get('/ssl')
   async getSSL(@Query() query: SslDto) {
     const { Do, si, vilage } = query;
-    const result = await this.apiService.getSslData(Do, si, vilage);
-    return result;
+    try {
+      const result = await this.apiService.getSslData(Do, si, vilage);
+      return result;
+    } catch (err) {
+      throw customError(err, this.logger);
+    }
   }
   @ApiOperation({
     summary: '초단기 예보 조회 ',
@@ -48,8 +60,12 @@ export class PublicApiController {
   @Get('/ssf')
   async getSSF(@Query() query: SslDto) {
     const { Do, si, vilage } = query;
-    const result = await this.apiService.getSsfData(Do, si, vilage);
-    return result;
+    try {
+      const result = await this.apiService.getSsfData(Do, si, vilage);
+      return result;
+    } catch (err) {
+      throw customError(err, this.logger);
+    }
   }
   @ApiOperation({
     summary: '단기 예보 조회 ',
@@ -63,8 +79,12 @@ export class PublicApiController {
   @Get('/stf')
   async getSTF(@Query() query: SslDto) {
     const { Do, si, vilage } = query;
-    const result = await this.apiService.getStfData(Do, si, vilage);
-    return result;
+    try {
+      const result = await this.apiService.getStfData(Do, si, vilage);
+      return result;
+    } catch (err) {
+      throw customError(err, this.logger);
+    }
   }
   //
   @ApiOperation({
@@ -84,7 +104,7 @@ export class PublicApiController {
       const result = await this.apiService.toggle(control);
       return result;
     } catch (err) {
-      throw new HttpException('ㅗ', HttpStatus.BAD_REQUEST);
+      throw customError(err, this.logger);
     }
     // return zz;
   }

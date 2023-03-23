@@ -145,11 +145,12 @@ export const connectGoogleApi = () => {
 };
 //
 export const getDate = () => {
-  const nowYear = `${new Date().getFullYear()}`;
+  const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
+  const nowYear = `${new Date(KoreaHour).getFullYear()}`;
   // 테스트 하고 싶다면 아래 시간대 변경후 public-api service 에서 min을 45 이상으로 변경
   // const mockHours = 0;
-  const mockHours = new Date().getHours();
-  const mockMonth = new Date().getMonth() + 1;
+  const mockHours = new Date(KoreaHour).getHours();
+  const mockMonth = new Date(KoreaHour).getMonth() + 1;
   let nowMonth = '';
   let nowHours = '';
   if (mockHours < 10) {
