@@ -31,10 +31,10 @@ export class PublicApiService {
   ) {}
 
   async getSslData(Do: string, si?: string, vilage?: string) {
-    const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
-    console.log(nx, ny);
-    const now = utils.getDate();
     try {
+      const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
+      console.log(nx, ny);
+      const now = utils.getDate();
       const ssl = await this.sslRepo.getSslDatas(nx, ny, now);
       return ssl;
     } catch (err) {
@@ -42,10 +42,10 @@ export class PublicApiService {
     }
   }
   async getSsfData(Do: string, si?: string, vilage?: string) {
-    const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
-    console.log(nx, ny);
-    const now = utils.getDate();
     try {
+      const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
+      console.log(nx, ny);
+      const now = utils.getDate();
       const ssf = await this.ssfRepo.getSsfDatas(nx, ny, now);
       return ssf;
     } catch (err) {
@@ -53,10 +53,10 @@ export class PublicApiService {
     }
   }
   async getStfData(Do: string, si?: string, vilage?: string) {
-    const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
-    console.log(nx, ny);
-    const now = utils.getDate();
     try {
+      const { nx, ny } = await this.gpsService.getGps(Do, si, vilage);
+      console.log(nx, ny);
+      const now = utils.getDate();
       const stf = await this.stfRepo.getStfDatas(nx, ny, now);
       return stf;
     } catch (err) {
@@ -66,30 +66,30 @@ export class PublicApiService {
 
   /**좌표목록 받아서 수집가능한 목록에한하여 수집 시작 */
   async reqAndDB(): Promise<void> {
-    if (worked.stf === true) worked.stf = false;
-    const workingLocationArr = (await this.locationService.getAllLocations())
-      .xyWorking;
-    // 대기 예보 시간대
-    const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
-
-    // 현재 시간과 분을 구하는 것
-    const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
-    const nowMinutes = new Date(KoreaHour).getMinutes();
-    const now = utils.getDate();
-
-    console.log(
-      '현재 시간 : ',
-      now.nowDate,
-      now.nowHours,
-      new Date().getMinutes(),
-    );
-    console.log(`SSL 요청 가능여부 : `, nowMinutes > 41);
-    console.log(`SSF 요청 가능여부 : `, nowMinutes > 46);
-    console.log(
-      `STF 요청 가능여부 : `,
-      nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours),
-    );
     try {
+      if (worked.stf === true) worked.stf = false;
+      const workingLocationArr = (await this.locationService.getAllLocations())
+        .xyWorking;
+      // 대기 예보 시간대
+      const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
+
+      // 현재 시간과 분을 구하는 것
+      const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
+      const nowMinutes = new Date(KoreaHour).getMinutes();
+      const now = utils.getDate();
+
+      console.log(
+        '현재 시간 : ',
+        now.nowDate,
+        now.nowHours,
+        new Date().getMinutes(),
+      );
+      console.log(`SSL 요청 가능여부 : `, nowMinutes > 41);
+      console.log(`SSF 요청 가능여부 : `, nowMinutes > 46);
+      console.log(
+        `STF 요청 가능여부 : `,
+        nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours),
+      );
       if (nowMinutes > 41 && worked.ssl === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
           await this.reqOpenApi(
