@@ -145,17 +145,17 @@ export const addLocation = (
   locationInfo: { Do: string[]; si: string[]; vilages: string[] },
 ) => {
   locationInfo.Do.map((Do) => {
-    if (!location.do.includes(Do)) {
+    if (!location.do.includes(Do) && Do !== '') {
       location.do.push(Do);
     }
   });
   locationInfo.si.map((si) => {
-    if (!location.si.includes(si)) {
+    if (!location.si.includes(si) && si !== '') {
       location.si.push(si);
     }
   });
   locationInfo.vilages.map((vilage) => {
-    if (!location.vilage.includes(vilage)) {
+    if (!location.vilage.includes(vilage) && vilage !== '') {
       location.vilage.push(vilage);
     }
   });
