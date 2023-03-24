@@ -37,7 +37,7 @@ export class SsfRepository {
     const data = await this.ssfModel.find({
       nx,
       ny,
-      openDate: { $gte: compareNow },
+      openDate: { $gte: now.nowDate },
       openTime: { $gte: compareNow },
     });
     return data;
