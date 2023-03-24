@@ -79,7 +79,6 @@ export class PublicApiService {
       const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
       const nowMinutes = new Date(KoreaHour).getMinutes();
       const now = utils.getDate();
-      console.log(worked.date !== now.nowDate + now.nowHours);
       if (worked.stf === true && worked.date !== now.nowDate + now.nowHours)
         worked.stf = false;
 
@@ -97,14 +96,14 @@ export class PublicApiService {
       );
       if (nowMinutes > 41 && worked.ssl === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
-          // await this.reqOpenApi(
-          //   this.baseUrl,
-          //   'getUltraSrtNcst',
-          //   this.serviceKey,
-          //   workingLocationArr[i].split(','),
-          //   now.nowTime,
-          //   now.nowDate,
-          // );
+          await this.reqOpenApi(
+            this.baseUrl,
+            'getUltraSrtNcst',
+            this.serviceKey,
+            workingLocationArr[i].split(','),
+            now.nowTime,
+            now.nowDate,
+          );
         }
         worked.date = now.nowDate + now.nowHours;
         worked.ssl = true;
@@ -113,14 +112,14 @@ export class PublicApiService {
       // SSF 요청
       if (nowMinutes > 46 && worked.ssf === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
-          // await this.reqOpenApi(
-          //   this.baseUrl,
-          //   'getUltraSrtFcst',
-          //   this.serviceKey,
-          //   workingLocationArr[i].split(','),
-          //   now.nowTime,
-          //   now.nowDate,
-          // );
+          await this.reqOpenApi(
+            this.baseUrl,
+            'getUltraSrtFcst',
+            this.serviceKey,
+            workingLocationArr[i].split(','),
+            now.nowTime,
+            now.nowDate,
+          );
         }
         worked.date = now.nowDate + now.nowHours;
         worked.ssf = true;
@@ -132,14 +131,14 @@ export class PublicApiService {
         worked.stf === false
       ) {
         for (let i = 0; i < workingLocationArr.length; i++) {
-          // await this.reqOpenApi(
-          //   this.baseUrl,
-          //   'getVilageFcst',
-          //   this.serviceKey,
-          //   workingLocationArr[i].split(','),
-          //   now.nowTime,
-          //   now.nowDate,
-          // );
+          await this.reqOpenApi(
+            this.baseUrl,
+            'getVilageFcst',
+            this.serviceKey,
+            workingLocationArr[i].split(','),
+            now.nowTime,
+            now.nowDate,
+          );
         }
         worked.stf = true;
         worked.date = now.nowDate + now.nowHours;
