@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { customError } from 'src/error/custom.error';
+import { CustomError, customError } from 'src/error/custom.error';
 import { GpsService } from 'src/gps/gps.service';
 import { Logger } from 'winston';
 import { LocationDto } from './dto/insert.dto';
@@ -31,7 +31,7 @@ export class LocationController {
 
   @ApiOperation({
     summary: '수집중인 모든 지역 확인',
-    description: '수집중인 모든지역의 지명 과 좌표 반환',
+    description: '수집중인 모든지역의 지명 과 모든 좌표 반환',
   })
   @ApiCreatedResponse({
     status: 200,
@@ -49,9 +49,9 @@ export class LocationController {
   //
 
   @ApiOperation({
-    summary: '수집지역 확인',
+    summary: '지역으로 해당지역 수집중인지 여부조회.   ',
     description:
-      '수집지역에 대한 정보를 확인하세요. \n예) 서울시 관악구 추가 => 서울특별시/관악구 body에 null 정확히 입력',
+      '지역정보를 정확하게 입력하세요. 도(시) 와 시(구)는 차이가 있습니다.',
   })
   @ApiCreatedResponse({
     status: 201,
@@ -62,7 +62,12 @@ export class LocationController {
   async getLocations(@Query() query: LocationDto) {
     const { Do, si, vilage } = query;
     try {
+      const locations = await this.locationService.getAllLocations();
       const gps = await this.gpsService.getGps(Do, si, vilage);
+      const isIncludes = `${gps.nx},${gps.ny}`;
+      if (!locations.xyWorking.includes(isIncludes)) {
+        throw new CustomError('미등록 지역 입니다.', 404);
+      }
       const arr = await this.locationService.getWorkingLocation(gps);
       const result = {
         gps: gps,
