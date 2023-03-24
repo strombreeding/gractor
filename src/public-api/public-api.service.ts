@@ -9,6 +9,7 @@ import { SslRepository } from './SSL.repo';
 import { StfRepository } from './STF.repo';
 
 const worked = {
+  date: utils.getDate().nowDate + utils.getDate().nowHours,
   ssl: false,
   ssf: false,
   stf: false,
@@ -68,7 +69,7 @@ export class PublicApiService {
   async reqAndDB(): Promise<void> {
     try {
       console.log('현재 작업상태', worked);
-      if (worked.stf === true) worked.stf = false;
+
       const workingLocationArr = (await this.locationService.getAllLocations())
         .xyWorking;
       // 대기 예보 시간대
@@ -78,6 +79,8 @@ export class PublicApiService {
       const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
       const nowMinutes = new Date(KoreaHour).getMinutes();
       const now = utils.getDate();
+      if (worked.stf === true && worked.date !== now.nowDate + now.nowHours)
+        worked.stf = false;
 
       console.log(
         '현재 시간 : ',
@@ -137,15 +140,18 @@ export class PublicApiService {
         }
         worked.stf = true;
       }
-      // 전부 했을경우
-      if (worked.ssf === true && worked.ssl === true) {
+      // SSL, SSF 요청 완료시 초기화
+      if (
+        worked.ssf === true &&
+        worked.ssl === true &&
+        worked.date !== now.nowDate + now.nowHours
+      ) {
         worked.ssf = false;
         worked.ssl = false;
       }
     } catch (err) {
-      throw new Error(err.message);
+      console.log(`ERROR : ${err.message}`);
     }
-    // // SSL 요청
   }
 
   /**reqAndDB 가 부르는 함수 DB에 저장하는 역할 */
