@@ -207,7 +207,7 @@ export class PublicApiService {
   async toggle(control: string) {
     if (control === 'start' && this.isWorking === 0) {
       console.log(control);
-      this.interval = setInterval(() => this.reqAndDB(), 5000);
+      this.interval = setInterval(() => this.reqAndDB(), 300000);
       this.isWorking = 1;
       return '수집 시작';
     } else if (control === 'end' && this.isWorking === 1) {
