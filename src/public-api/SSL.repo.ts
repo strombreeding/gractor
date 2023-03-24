@@ -32,7 +32,7 @@ export class SslRepository {
       Number(now.nowTime) - 100 === -100
         ? '2300'
         : Number(now.nowTime) - 100 < 1000
-        ? `0${Number(now.nowDate) - 100}`
+        ? `0${Number(now.nowTime) - 100}`
         : String(Number(now.nowTime) - 100);
     const data = await this.sslModel.find({
       nx,
