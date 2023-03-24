@@ -2,21 +2,21 @@ import { ApiProperty } from '@nestjs/swagger/dist/decorators/api-property.decora
 
 export class LocationDto {
   @ApiProperty({
-    example: '서울특별시',
+    example: '서울특별시 : 단독 O',
     description: 'Do',
     required: false,
   })
   Do: string;
 
   @ApiProperty({
-    example: '관악구 or 데이터입력 X',
+    example: '관악구 : 단독 O',
     description: 'si',
     required: false,
   })
   si: string | null;
 
   @ApiProperty({
-    example: '성현동 or 데이터입력 X',
+    example: '성현동 : 단독 X, 반드시 도 & 시 입력',
     description: 'vilage',
     required: false,
   })

@@ -32,7 +32,7 @@ export class PublicApiController {
   @ApiOperation({
     summary: '초단기 실황 조회 ',
     description:
-      '현재 시간기준으로 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요.',
+      '현재 시간 또는 1시간 전 기준으로 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요.',
   })
   @ApiCreatedResponse({
     status: 200,
@@ -51,7 +51,7 @@ export class PublicApiController {
   @ApiOperation({
     summary: '초단기 예보 조회 ',
     description:
-      '현재 시간기준으로 6시간 이후까지의 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요. ',
+      '현재 시간 또는 1시간 전 기준으로 6시간 이후까지의 데이터를 가져옵니다. 지역 입력시 공백없이 입력하세요. ',
   })
   @ApiCreatedResponse({
     status: 200,

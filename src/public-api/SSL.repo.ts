@@ -28,11 +28,15 @@ export class SslRepository {
       nowHours: string;
     },
   ) {
+    const compareNow =
+      Number(now.nowTime) - 100 === -100
+        ? '2300'
+        : String(Number(now.nowTime) - 100);
     const data = await this.sslModel.find({
       nx,
       ny,
-      openDate: { $gte: now.nowDate },
-      openTime: { $gte: now.nowTime },
+      openDate: { $gte: compareNow },
+      openTime: { $gte: compareNow },
     });
     return data;
   }
