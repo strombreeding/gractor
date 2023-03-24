@@ -18,7 +18,7 @@ const worked = {
 export class PublicApiService {
   private interval = setInterval(() => {
     this.reqAndDB();
-  }, 300000);
+  }, 3000);
 
   private isWorking = 1;
   private baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
@@ -79,6 +79,7 @@ export class PublicApiService {
       const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
       const nowMinutes = new Date(KoreaHour).getMinutes();
       const now = utils.getDate();
+      console.log(worked.date !== now.nowDate + now.nowHours);
       if (worked.stf === true && worked.date !== now.nowDate + now.nowHours)
         worked.stf = false;
 
@@ -96,30 +97,32 @@ export class PublicApiService {
       );
       if (nowMinutes > 41 && worked.ssl === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
-          await this.reqOpenApi(
-            this.baseUrl,
-            'getUltraSrtNcst',
-            this.serviceKey,
-            workingLocationArr[i].split(','),
-            now.nowTime,
-            now.nowDate,
-          );
+          // await this.reqOpenApi(
+          //   this.baseUrl,
+          //   'getUltraSrtNcst',
+          //   this.serviceKey,
+          //   workingLocationArr[i].split(','),
+          //   now.nowTime,
+          //   now.nowDate,
+          // );
         }
+        worked.date = now.nowDate + now.nowHours;
         worked.ssl = true;
       }
 
       // SSF 요청
       if (nowMinutes > 46 && worked.ssf === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
-          await this.reqOpenApi(
-            this.baseUrl,
-            'getUltraSrtFcst',
-            this.serviceKey,
-            workingLocationArr[i].split(','),
-            now.nowTime,
-            now.nowDate,
-          );
+          // await this.reqOpenApi(
+          //   this.baseUrl,
+          //   'getUltraSrtFcst',
+          //   this.serviceKey,
+          //   workingLocationArr[i].split(','),
+          //   now.nowTime,
+          //   now.nowDate,
+          // );
         }
+        worked.date = now.nowDate + now.nowHours;
         worked.ssf = true;
       }
       // STF 요청
@@ -129,16 +132,17 @@ export class PublicApiService {
         worked.stf === false
       ) {
         for (let i = 0; i < workingLocationArr.length; i++) {
-          await this.reqOpenApi(
-            this.baseUrl,
-            'getVilageFcst',
-            this.serviceKey,
-            workingLocationArr[i].split(','),
-            now.nowTime,
-            now.nowDate,
-          );
+          // await this.reqOpenApi(
+          //   this.baseUrl,
+          //   'getVilageFcst',
+          //   this.serviceKey,
+          //   workingLocationArr[i].split(','),
+          //   now.nowTime,
+          //   now.nowDate,
+          // );
         }
         worked.stf = true;
+        worked.date = now.nowDate + now.nowHours;
       }
       // SSL, SSF 요청 완료시 초기화
       if (
