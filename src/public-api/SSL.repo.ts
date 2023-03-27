@@ -31,6 +31,8 @@ export class SslRepository {
     const compareNow =
       Number(now.nowTime) - 100 === -100
         ? '2300'
+        : Number(now.nowTime) - 100 < 1000
+        ? `0${Number(now.nowTime) - 100}`
         : String(Number(now.nowTime) - 100);
     const data = await this.sslModel.find({
       nx,
