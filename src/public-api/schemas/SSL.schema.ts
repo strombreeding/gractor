@@ -14,7 +14,7 @@ export class Ssl {
   @Prop({
     default: new Date(),
     type: mongoose.Schema.Types.Date,
-    expires: 86400 * 1,
+    // expires: 86400 * 1,
   })
   createdAt: Date;
 

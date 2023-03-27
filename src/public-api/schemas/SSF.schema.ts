@@ -14,7 +14,7 @@ export class Ssf {
   @Prop({
     default: new Date(),
     type: mongoose.Schema.Types.Date,
-    expires: 86400 / 2,
+    // expires: 86400 / 2,
   })
   createdAt: Date;
 

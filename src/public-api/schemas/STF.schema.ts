@@ -12,7 +12,7 @@ export class Stf {
   @Prop({
     default: new Date(),
     type: mongoose.Schema.Types.Date,
-    expires: 86400 * 3,
+    // expires: 86400 * 3,
   })
   createdAt: Date;
 
