@@ -30,7 +30,4 @@ jobs:
           "
         ' > connection.sh 
     - run: cat connection.sh
-    - run: |
-        sh connection.sh '
-          docker ps
-        '
+    - run: connection.sh
