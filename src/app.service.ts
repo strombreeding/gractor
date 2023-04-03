@@ -3,8 +3,8 @@ import axios from 'axios';
 
 @Injectable()
 export class AppService {
-  getHello(): Date {
+  getHello(): string {
     const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
-    return new Date(KoreaHour);
+    return `현재 날짜는 ${new Date(KoreaHour)} 입니다.`;
   }
 }
