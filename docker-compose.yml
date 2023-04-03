@@ -1,0 +1,48 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - 22080:80
+    volumes:
+      - ./default.conf/:/etc/nginx/conf.d/default.conf
+      - ./logs/nginx/:/var/log/nginx/
+
+  mongodb:
+    image: mongo:4.4
+    restart: always
+    ports:
+      - 23456:27017
+
+  blue:
+    image: report
+    container_name: blue
+    restart: always
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs/nest/:/logs/
+    expose:
+      - 3000
+    links:
+      - mongodb:mongodb
+    depends_on:
+      - mongodb
+
+  green:
+    image: report
+    container_name: green
+    restart: always
+    env_file:
+      - ./.env
+    volumes:
+      - ./logs/nest/:/logs/
+    expose:
+      - 3000
+    links:
+      - mongodb:mongodb
+    depends_on:
+      - mongodb
