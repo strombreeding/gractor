@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v3
       - run: touch connection.sh
       - run:
-          echo -e 'PW=#test1234\nsshpass -p $PW ssh -o StrictHostKeyChecking=no  -l test test.gractor.com -p 22022 "
+          echo -e 'PW=${{secrets.PW}}\nsshpass -p $PW ssh -o StrictHostKeyChecking=no  -l test test.gractor.com -p 22022 "
           cd gractor &&
           git pull origin main &&
           docker build -f Dockerfile -t report .
