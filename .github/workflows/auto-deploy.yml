@@ -22,5 +22,5 @@ jobs:
 #     - run: npm test
     - uses: actions/checkout@v3
     - run: touch connection.sh
-    - run: echo -e 'PW=#test1234\nsshpass -p $PW ssh -l test test.gractor.com -p 22022' > connection.sh 
+    - run: echo -e 'PW=#test1234\nsshpass -p $PW ssh -l -tt test test.gractor.com -p 22022' > connection.sh 
     - run: sh connection.sh
