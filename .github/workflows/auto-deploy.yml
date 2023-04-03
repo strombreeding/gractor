@@ -22,7 +22,7 @@ jobs:
 #     - run: npm test
     - uses: actions/checkout@v3
     - run: echo `
-          PW=#test1234;
-          sshpass -p $PW ssh -l test test.gractor.com -p 22022
+        'PW=#test1234' 
+        sshpass -p $PW ssh -l test test.gractor.com -p 22022
         ` >> connection.sh 
     - run: connections.sh && docker ps
