@@ -151,8 +151,10 @@ export const getDate = () => {
   // const mockHours = 0;
   const mockHours = new Date(KoreaHour).getHours();
   const mockMonth = new Date(KoreaHour).getMonth() + 1;
+  const mockDate = new Date(KoreaHour).getDate();
   let nowMonth = '';
   let nowHours = '';
+  let nowDate = '';
   if (mockHours < 10) {
     nowHours = `0${mockHours}`;
   } else {
@@ -163,9 +165,14 @@ export const getDate = () => {
   } else {
     nowMonth = `${mockMonth}`;
   }
+  if (mockDate < 10) {
+    nowDate = `0${mockDate}`;
+  } else {
+    nowDate = `${mockDate}`;
+  }
 
   const result = {
-    nowDate: `${nowYear}${nowMonth}${new Date(KoreaHour).getDate()}`,
+    nowDate: `${nowYear}${nowMonth}${nowDate}`,
     nowTime: nowHours + '00',
     nowHours,
   };

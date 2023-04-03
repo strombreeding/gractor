@@ -14,8 +14,9 @@ export class GpsRepository {
   async gpsToLocations(gps: any) {
     const stringXY = [gps.nx, gps.ny];
     const arr = await this.gpsModel.find({
-      etc: { $all: [{ nx: gps.nx }, { ny: gps.ny }] },
+      etc: { $elemMatch: { nx: gps.nx, ny: gps.ny } },
     });
+
     const document = await this.gpsModel.find({ defaultXY: stringXY });
     const result = {
       Do: [],
