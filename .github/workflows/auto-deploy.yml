@@ -24,4 +24,7 @@ jobs:
     - run: touch connection.sh
     - run: echo -e 'PW=#test1234\nsshpass -p $PW ssh -o StrictHostKeyChecking=no  -l test test.gractor.com -p 22022' > connection.sh 
     - run: cat connection.sh
-    - run: sh connection.sh | docker ps
+    - run: |
+        sh connection.sh '
+          docker ps
+        '
