@@ -98,6 +98,15 @@ export class StfRepository {
         nx: newStf.nx,
         ny: newStf.ny,
       });
+      const temp = await this.stfModel.findOne({
+        openDate: newStf.openDate,
+        lowTemp: { $ne: '' },
+        heightTemp: { $ne: '' },
+      });
+      if (temp) {
+        newStf.heightTemp = temp.heightTemp;
+        newStf.lowTemp = temp.lowTemp;
+      }
       if (stf) {
         await this.stfModel.updateOne({ _id: stf._id }, { $set: newStf });
       } else {

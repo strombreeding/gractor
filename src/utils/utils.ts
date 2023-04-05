@@ -23,7 +23,9 @@ export const addSignGender = (category: string, obsrValue: string) => {
       break;
     case 'PCP':
       category = `${obsrValue} mm `;
-      if (obsrValue === '강수없음') category = `${obsrValue} `;
+      if (obsrValue === '강수없음') {
+        category = `${obsrValue} `;
+      }
       break;
     case 'REH':
       category = `${obsrValue} %`;
