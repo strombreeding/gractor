@@ -105,11 +105,11 @@ export class LocationService {
       getTime.nowDate = `${Number(getTime.nowDate) - 1}`;
     }
     if (String(Number(getTime.nowTime) - 100).length === 3) {
-      console.log('1자리?');
       getTime.nowTime = `0${String(Number(getTime.nowTime) - 100)}`;
     } else if (String(Number(getTime.nowTime) - 100).length === 1) {
-      console.log('2자리?');
       getTime.nowTime = `0000`;
+    } else {
+      getTime.nowTime = `${String(Number(getTime.nowTime) - 100)}`;
     }
     const nowTime = getTime.nowTime;
     const nowDate = getTime.nowDate;
