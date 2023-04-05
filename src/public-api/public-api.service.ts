@@ -175,6 +175,7 @@ export class PublicApiService {
     ];
     // workingGPS.join('/,');
     console.log('펑션타입 : ', functionType);
+    console.log('현재 시각 : ', nowTime);
     if (!acceptFunction.includes(functionType))
       throw new HttpException('상세기능이아님', HttpStatus.BAD_REQUEST);
     const query = `${baseUrl}${functionType}?serviceKey=${serviceKey}&numOfRows=1000&pageNo=1&base_date=${nowDate}&base_time=${nowTime}&nx=${workingGPS[0]}&ny=${workingGPS[1]}&dataType=JSON`;

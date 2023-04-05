@@ -99,21 +99,33 @@ export class LocationService {
     const serviceKey = process.env.SERVICE_KEY;
     const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
     const getTime = util.getDate();
-
     //SSL, SSF 를 위한 1시간 전 구하기
+    if (getTime.nowTime === '0000') {
+      getTime.nowTime = '2300';
+      getTime.nowDate = `${Number(getTime.nowDate) - 1}`;
+    }
     if (String(Number(getTime.nowTime) - 100).length === 3) {
+      console.log('1자리?');
       getTime.nowTime = `0${String(Number(getTime.nowTime) - 100)}`;
     } else if (String(Number(getTime.nowTime) - 100).length === 1) {
+      console.log('2자리?');
       getTime.nowTime = `0000`;
     }
     const nowTime = getTime.nowTime;
     const nowDate = getTime.nowDate;
     // 가장 최근 발표된 stf 시간
+    let test = 0;
+    // while (test < 24) {
     while (!acceptHoursOfSTF.includes(getTime.nowHours)) {
+      if (getTime.nowHours === '00') {
+        getTime.nowHours = '24';
+      }
       getTime.nowHours =
         `${Number(getTime.nowHours) - 1}`.length !== 1
-          ? `${Number(getTime.nowHours) - 1}`
-          : `0${Number(getTime.nowHours) - 1}`;
+          ? `${Math.abs(Number(getTime.nowHours) - 1)}`
+          : `0${Math.abs(Number(getTime.nowHours) - 1)}`;
+      console.log(getTime.nowHours);
+      ++test;
     }
     const forStfTime =
       `${Number(getTime.nowHours)}`.length === 1
@@ -137,6 +149,7 @@ export class LocationService {
       nowTime,
       nowDate,
     );
+    console.log(forStfTime, '이게 들어갈텐데');
     const stfRequest = await this.publicService.reqOpenApi(
       baseUrl,
       'getVilageFcst',
