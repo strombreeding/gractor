@@ -77,9 +77,11 @@ export class PublicApiService {
     try {
       console.log('현재 작업상태', worked);
 
+      // 현재 수집중인 지역의 XY 좌표 배열
       const workingLocationArr = (await this.locationService.getAllLocations())
         .xyWorking;
-      // 대기 예보 시간대
+
+      // 대기 예보 요청 가능 시간대
       const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
 
       // 현재 시간과 분을 구하는 것
@@ -96,6 +98,8 @@ export class PublicApiService {
         `STF 요청 가능여부 : `,
         nowMinutes > 11 && acceptHoursOfSTF.includes(now.nowHours),
       );
+
+      // SSL 요청
       if (nowMinutes > 41 && worked.ssl === false) {
         for (let i = 0; i < workingLocationArr.length; i++) {
           await this.reqOpenApi(
@@ -126,6 +130,7 @@ export class PublicApiService {
         worked.date = now.nowDate + now.nowHours;
         worked.ssf = true;
       }
+
       // STF 요청
       if (
         nowMinutes > 11 &&
@@ -145,7 +150,8 @@ export class PublicApiService {
         worked.stf = true;
         worked.date = now.nowDate + now.nowHours;
       }
-      // SSL, SSF 요청 완료시 초기화
+
+      // SSL, SSF 요청 완료시 초기화 ( 중복요청 방지 )
       if (
         worked.ssf === true &&
         worked.ssl === true &&
@@ -173,11 +179,14 @@ export class PublicApiService {
       'getUltraSrtFcst',
       'getVilageFcst',
     ];
-    // workingGPS.join('/,');
     console.log('펑션타입 : ', functionType);
     console.log('현재 시각 : ', nowTime);
+
+    // 정해진 함수명 이외의 문자열이 들어올경우 오류
     if (!acceptFunction.includes(functionType))
       throw new HttpException('상세기능이아님', HttpStatus.BAD_REQUEST);
+
+    // 요청보낼 query
     const query = `${baseUrl}${functionType}?serviceKey=${serviceKey}&numOfRows=1000&pageNo=1&base_date=${nowDate}&base_time=${nowTime}&nx=${workingGPS[0]}&ny=${workingGPS[1]}&dataType=JSON`;
     try {
       const openData = await axios.get(query);
@@ -186,6 +195,8 @@ export class PublicApiService {
         throw new CustomError(`데이터 수집 실패:${query}`, 500);
       }
       const dataArr = openData.data.response.body.items.item;
+
+      // 무슨 데이터인지 구분하여 각각 맞는 create 실행
       switch (functionType) {
         case acceptFunction[0]:
           await this.sslRepo.create(dataArr, workingGPS);

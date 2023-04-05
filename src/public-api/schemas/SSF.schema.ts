@@ -53,14 +53,20 @@ export class Ssf {
   @Prop()
   thunderstroke: string; // 낙뢰 kA
 }
-// T1H	기온	℃	10
-// RN1	1시간 강수량	mm	8
-// UUU	동서바람성분	m/s	12
-// VVV	남북바람성분	m/s	12
-// REH	습도	%	8
-// PTY	강수형태	코드값	4
-// VEC	풍향	deg	10
-// WSD	풍속	m/s	10
+/**
+ * 
+T1H	기온	℃
+RN1	1시간 강수량	범주 (1 mm)
+SKY	하늘상태	코드값
+UUU	동서바람성분	m/s
+VVV	남북바람성분	m/s
+REH	습도	%
+PTY	강수형태	코드값
+LGT	낙뢰	kA(킬로암페어)
+VEC	풍향	deg
+WSD	풍속	m/s
+
+ */
 
 // 위의 작성한 클래스를 바탕으로 Mongoose에서 사용하는 스키마 클래스를 만들어준다.
 export const SsfSchema = SchemaFactory.createForClass(Ssf);
