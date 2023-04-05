@@ -128,4 +128,12 @@ export class LocationController {
     }
   }
   //
+  @ApiOperation({
+    summary: 'test',
+  })
+  @Get('/test')
+  async zz() {
+    const a = await this.locationService.getForInsertLocation('z');
+    return a;
+  }
 }

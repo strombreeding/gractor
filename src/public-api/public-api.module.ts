@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PublicApiService } from './public-api.service';
 import { PublicApiController } from './public-api.controller';
 import { GpsModule } from '../gps/gps.module';
@@ -16,7 +16,7 @@ import { StfRepository } from './STF.repo';
 
 @Module({
   imports: [
-    LocationModule,
+    forwardRef(() => LocationModule),
     GpsModule,
     MongooseModule.forFeature([
       { name: Ssl.name, schema: SslSchema },
@@ -26,5 +26,6 @@ import { StfRepository } from './STF.repo';
   ],
   providers: [PublicApiService, SslRepository, SsfRepository, StfRepository],
   controllers: [PublicApiController],
+  exports: [PublicApiService, SslRepository, SsfRepository, StfRepository],
 })
 export class PublicApiModule {}

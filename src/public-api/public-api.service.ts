@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import axios from 'axios';
 import { CustomError } from 'src/error/custom.error';
 import { GpsService } from 'src/gps/gps.service';
@@ -25,6 +31,7 @@ export class PublicApiService {
   private serviceKey = process.env.SERVICE_KEY;
   constructor(
     private gpsService: GpsService,
+    @Inject(forwardRef(() => LocationService))
     private locationService: LocationService,
     private sslRepo: SslRepository,
     private ssfRepo: SsfRepository,
@@ -82,12 +89,7 @@ export class PublicApiService {
       if (worked.stf === true && worked.date !== now.nowDate + now.nowHours)
         worked.stf = false;
 
-      console.log(
-        '현재 시간 : ',
-        now.nowDate,
-        now.nowHours,
-        new Date().getMinutes(),
-      );
+      console.log('현재 시간 : ', now.nowDate, now.nowHours);
       console.log(`SSL 요청 가능여부 : `, nowMinutes > 41);
       console.log(`SSF 요청 가능여부 : `, nowMinutes > 46);
       console.log(

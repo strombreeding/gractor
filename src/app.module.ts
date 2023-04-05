@@ -4,15 +4,14 @@ import { AppService } from './app.service';
 import { PublicApiModule } from './public-api/public-api.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { GpsModule } from './gps/gps.module';
 import { LocationModule } from './location/location.module';
 import { WinstonModule } from 'nest-winston';
 import { winstonLogger } from './configs/winston';
-// import { LoggerMiddleware } from './middlewares/logger.middleware';
 
 @Module({
   imports: [
     PublicApiModule,
+    LocationModule,
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.MONGODB_URL ||
