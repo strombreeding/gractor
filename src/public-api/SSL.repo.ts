@@ -44,6 +44,7 @@ export class SslRepository {
   }
 
   async create(data: SslType[], gps: any) {
+    console.log('ssl 생성');
     let newSsl = {
       openTime: data[0].baseTime,
       openDate: data[0].baseDate,

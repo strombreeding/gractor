@@ -145,7 +145,8 @@ export const connectGoogleApi = () => {
 };
 //
 export const getDate = () => {
-  const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
+  const KoreaHour = Date.now();
+  // const KoreaHour = Date.now() + 9 * 60 * 60 * 1000;
   const nowYear = `${new Date(KoreaHour).getFullYear()}`;
   // 테스트 하고 싶다면 아래 시간대 변경후 public-api service 에서 min을 45 이상으로 변경
   // const mockHours = 0;

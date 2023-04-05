@@ -63,7 +63,9 @@ export class LocationService {
         const newLocation = await this.locationModel.findOne({
           xyWorking: stringXY,
         });
-        await this.getForInsertLocation(stringXY);
+        const a = await this.getForInsertLocation(xyArr);
+        console.log('시작', a);
+
         return newLocation;
       } else if (!aleardyLocation.xyWorking.includes(stringXY)) {
         // 좌표값 추가
@@ -80,6 +82,9 @@ export class LocationService {
           { _id: updateLocation._id },
           { $set: updateLocation },
         );
+        const a = await this.getForInsertLocation(xyArr);
+        console.log('시작', a);
+
         return updateLocation;
       } else {
         return '이미 추가된 지역입니다.';
@@ -89,7 +94,7 @@ export class LocationService {
     }
   }
   /**XY주면 가장 최근의 발표된 OpenAPI 데이터 수집후 저장함 */
-  async getForInsertLocation(stringXY: string) {
+  async getForInsertLocation(arr: any) {
     const baseUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/`;
     const serviceKey = process.env.SERVICE_KEY;
     const acceptHoursOfSTF = ['02', '05', '08', '11', '14', '17', '20', '23'];
@@ -120,7 +125,7 @@ export class LocationService {
       baseUrl,
       'getUltraSrtNcst',
       serviceKey,
-      [stringXY],
+      arr,
       nowTime,
       nowDate,
     );
@@ -128,7 +133,7 @@ export class LocationService {
       baseUrl,
       'getUltraSrtFcst',
       serviceKey,
-      [stringXY],
+      arr,
       nowTime,
       nowDate,
     );
@@ -136,7 +141,7 @@ export class LocationService {
       baseUrl,
       'getVilageFcst',
       serviceKey,
-      [stringXY],
+      arr,
       forStfTime,
       nowDate,
     );
