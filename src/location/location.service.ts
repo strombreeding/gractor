@@ -63,6 +63,7 @@ export class LocationService {
         const newLocation = await this.locationModel.findOne({
           xyWorking: stringXY,
         });
+        // 새로운 지역 추가시 1시간 전 데이터를 추가하는 로직
         const a = await this.getForInsertLocation(xyArr);
         console.log('시작', a);
 
@@ -82,6 +83,7 @@ export class LocationService {
           { _id: updateLocation._id },
           { $set: updateLocation },
         );
+        // 새로운 지역 추가시 1시간 전 데이터를 추가하는 로직
         const a = await this.getForInsertLocation(xyArr);
         console.log('시작', a);
 
