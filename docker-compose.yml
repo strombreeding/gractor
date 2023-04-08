@@ -18,7 +18,7 @@ services:
       - 23456:27017
 
   blue:
-    image: report
+    image: deploy/blue
     container_name: blue
     restart: always
     env_file:
@@ -33,7 +33,7 @@ services:
       - mongodb
 
   green:
-    image: report
+    image: deploy/green
     container_name: green
     restart: always
     env_file:
