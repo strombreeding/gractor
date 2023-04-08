@@ -26,7 +26,6 @@ jobs:
           echo -e 'PW=${{secrets.PW}}\nsshpass -p $PW ssh -o StrictHostKeyChecking=no  -l test test.gractor.com -p 22022 "
           cd gractor &&
           git pull origin main &&
-          docker build -f Dockerfile -t report .&&
           sh docker.sh
           "
           ' > connection.sh
